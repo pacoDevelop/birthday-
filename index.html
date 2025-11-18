@@ -164,7 +164,7 @@
 
         .day-button.locked {
             background: linear-gradient(135deg, #808080, #696969);
-            cursor: not-allowed;
+            /*cursor: not-allowed;*/
             opacity: 0.6;
         }
 
@@ -797,7 +797,7 @@
 </head>
 <body>
     <!-- Test Mode Button -->
-    <button class="test-mode-button" onclick="toggleTestMode()" id="testModeButton" aria-pressed="false" aria-label="Alternar modo test">
+    <button class="test-mode-button" hidden onclick="toggleTestMode()" id="testModeButton" aria-pressed="false" aria-label="Alternar modo test">
         🧪 MODO TEST
     </button>
     
@@ -809,7 +809,7 @@
 
         <!-- Control Panel -->
         <div class="control-panel">
-            <div class="mode-indicator" id="modeIndicator">
+            <div  style="display: none" class="mode-indicator" id="modeIndicator">
                 Modo Normal
             </div>
             <h3 style="margin-bottom: 20px; color: #8B4513;">Selector de Días</h3>
@@ -959,7 +959,8 @@
         };
         let testMode = false;
         let currentLabPosition = 0;
-        let finalCelebrationShown = false; // Control para celebración final única
+        let finalCelebrationShown = false;
+        let labyrinthSize = 8; // Tamaño del laberinto
 
         const targetDate = new Date('2025-11-23T00:00:00');
 
@@ -979,22 +980,33 @@
             loadProgress();
             updateDayLocks();
             selectInitialDay();
-            // Cerrar hints al hacer clic fuera
             document.addEventListener('click', handleClickOutside);
+            const urlParams = new URLSearchParams(window.location.search);
+    
+            if (urlParams.get('hackTest') === 'true') {
+                // Buscar y mostrar modeIndicator (quitar display: none)
+                const modeIndicator = document.getElementById('modeIndicator');
+                if (modeIndicator) {
+                    modeIndicator.style.display = '';  // Quita el display: none y restaura al valor por defecto
+                }
+                
+                // Buscar y mostrar testModeButton (quitar clase hidden)
+                const testModeButton = document.getElementById('testModeButton');
+                if (testModeButton) {
+                    testModeButton.removeAttribute('hidden');
+                }
+            }
         });
 
         function selectInitialDay() {
             const today = new Date().getDate();
             
             if (testMode) {
-                // En modo test, siempre empezar en día 19
                 selectDay(19);
             } else {
-                // En modo normal, solo si es un día válido
                 if (today >= 19 && today <= 23) {
                     selectDay(today);
                 } else {
-                    // Mostrar mensaje si no hay día disponible
                     showInfoMessage('Ningún día disponible aún. ¡Vuelve el 19 de noviembre!');
                 }
             }
@@ -1014,21 +1026,19 @@
                 indicator.textContent = 'Modo Test';
                 indicator.classList.add('test-mode');
                 
-                // Desbloquear todos los días
                 document.querySelectorAll('.day-button').forEach(btn => {
                     btn.classList.remove('locked');
                     btn.setAttribute('aria-disabled', 'false');
                 });
                 
                 showInfoMessage('🧪 Modo TEST activado - Todos los juegos desbloqueados!');
-                selectDay(19); // Siempre iniciar en día 19 en test
+                selectDay(19);
             } else {
                 button.textContent = '🧪 MODO TEST';
                 button.classList.remove('active');
                 indicator.textContent = 'Modo Normal';
                 indicator.classList.remove('test-mode');
                 
-                // Restaurar bloqueos según fecha
                 updateDayLocks();
                 showInfoMessage('🔒 Modo TEST desactivado - Regreso al modo normal');
                 selectInitialDay();
@@ -1080,7 +1090,6 @@
             
             // Resetear posición del laberinto si se selecciona día 21
             if (day === 21) {
-                currentLabPosition = 0;
                 resetLabyrinth();
             }
             
@@ -1100,15 +1109,19 @@
             document.getElementById(`game${day}`).classList.add('active');
         }
 
-        // Resetear visualización del laberinto
+        // Resetear visualización del laberinto - CORREGIDO
         function resetLabyrinth() {
+            currentLabPosition = 0; // Resetear posición a inicio
+            
             const cells = document.querySelectorAll('.labyrinth-cell-advanced');
-            cells.forEach(cell => {
+            cells.forEach((cell, index) => {
+                // Solo quitar 'visited' de celdas normales, NO de inicio
                 if (!cell.classList.contains('start') && !cell.classList.contains('end') && !cell.classList.contains('wall')) {
                     cell.classList.remove('visited');
                 }
             });
-            // Marcar celda inicial como visitada
+            
+            // Asegurar que la celda de inicio sea visible y marcada
             const startCell = document.querySelector('.labyrinth-cell-advanced.start');
             if (startCell) {
                 startCell.classList.add('visited');
@@ -1181,7 +1194,7 @@
         }
 
         function rotateMosaicTile(tile, solution) {
-            if (gameStates.mosaic.completed) return; // No permitir si ya completado
+            if (gameStates.mosaic.completed) return;
             
             const currentRotation = parseInt(tile.dataset.rotation);
             const newRotation = (currentRotation + 90) % 360;
@@ -1192,14 +1205,14 @@
             checkMosaicAdvancedCompletion(solution);
         }
 
-        function checkMosaicAdvancedCompletion(solution) {
+        function checkMosaicAdvancedCompletion() {
             const tiles = document.querySelectorAll('.mosaic-tile');
             let correctCount = 0;
-            
-            tiles.forEach((tile, index) => {
-                const rotation = parseInt(tile.dataset.rotation);
-                const correctRotation = parseInt(tile.dataset.correctRotation);
-                
+        
+            tiles.forEach(tile => {
+                const rotation = parseInt(tile.dataset.rotation) || 0;
+                const correctRotation = parseInt(tile.dataset.correctRotation) || 0;
+        
                 if (rotation === correctRotation) {
                     tile.classList.add('correct');
                     correctCount++;
@@ -1207,16 +1220,17 @@
                     tile.classList.remove('correct');
                 }
             });
-            
+        
             const progress = (correctCount / tiles.length) * 100;
             document.getElementById('mosaicProgress').style.width = progress + '%';
             gameStates.mosaic.progress = progress;
-            
+        
+            // Solo se ejecuta UNA vez cuando se completa
             if (correctCount === tiles.length && !gameStates.mosaic.completed) {
                 gameStates.mosaic.completed = true;
                 completedDays.add(19);
                 updateProgress();
-                showSuccessMessage('¡Mosaico mágico completado!');
+                showSuccessMessage('¡Mosaico mágico completado perfectamente!');
                 createCelebrationParticles();
             }
         }
@@ -1294,72 +1308,102 @@
             }
         }
 
-        // Game 3: Advanced Labyrinth
+        // Game 3: Advanced Labyrinth - CORREGIDO y OPTIMIZADO
         function initializeLabyrinthAdvanced() {
             const grid = document.getElementById('labyrinthAdvanced');
-            const size = 8;
-            
             const labyrinth = [
-                [0, 1, 0, 0, 0, 0, 0, 0],
+                [0, 1, 0, 0, 0, 0, 0, 0], // Fila 0: Inicio en (0,0)
                 [0, 1, 0, 1, 1, 1, 1, 0],
                 [0, 1, 0, 1, 0, 0, 1, 0],
                 [0, 1, 1, 1, 1, 0, 1, 0],
                 [0, 0, 0, 0, 1, 0, 1, 0],
                 [1, 1, 1, 0, 1, 0, 1, 0],
                 [0, 0, 1, 0, 1, 0, 1, 0],
-                [0, 0, 0, 0, 0, 0, 0, 2]
+                [0, 0, 0, 0, 0, 0, 0, 2]  // Fila 7: Meta en (7,7)
             ];
-            
+        
+            // Debe coincidir con el tamaño real del array
+            const size = labyrinth.length; // 8 en tu caso
+            grid.innerHTML = '';
+        
             for (let i = 0; i < size * size; i++) {
                 const cell = document.createElement('div');
                 cell.className = 'labyrinth-cell-advanced';
                 cell.dataset.index = i;
-                
+        
                 const row = Math.floor(i / size);
                 const col = i % size;
-                
-                if (labyrinth[row][col] === 1) {
+                const cellType = labyrinth[row][col];
+        
+                if (cellType === 1) {
                     cell.classList.add('wall');
-                } else if (labyrinth[row][col] === 0 && i === 0) {
-                    cell.classList.add('start');
-                    cell.textContent = '🏁';
-                    cell.classList.add('visited');
-                } else if (labyrinth[row][col] === 2) {
+                } else if (cellType === 2) {
                     cell.classList.add('end');
                     cell.textContent = '🏆';
+                } else if (row === 0 && col === 0) {
+                    cell.classList.add('start');
+                    cell.textContent = '🏁';
+                    cell.classList.add('visited'); // opcional
                 }
-                
-                if (!cell.classList.contains('wall')) {
-                    cell.addEventListener('click', function() {
-                        handleLabyrinthAdvancedClick(i, labyrinth, size);
-                    });
+        
+                // Añadimos listener solo si no es pared
+                if (cellType !== 1) {
+                    // pasar labyrinth y size al handler, y el evento para usar currentTarget
+                    cell.addEventListener('click', (e) => handleLabyrinthClick(i, labyrinth, size, e));
                 }
-                
+        
                 grid.appendChild(cell);
             }
+        
+            // Inicializar posición global
+            currentLabPosition = 0;
+            // Asegurar estado del juego
+            if (!gameStates) gameStates = {};
+            if (!gameStates.labyrinth) gameStates.labyrinth = { completed: false };
         }
-
-        function handleLabyrinthAdvancedClick(index, labyrinth, size) {
-            const cell = document.querySelector(`[data-index="${index}"]`);
-            const row = Math.floor(index / size);
-            const col = index % size;
-            
-            if (labyrinth[row][col] === 1) return;
-            
+        
+        function handleLabyrinthClick(index, labyrinth, size, event) {
+            // Debug rápido
+            console.log('click index', index, 'size param', size, 'labyrinthSize(global?)', typeof labyrinthSize !== 'undefined' ? labyrinthSize : 'undefined');
+            if (gameStates.labyrinth && gameStates.labyrinth.completed) {
+                console.log('Juego ya completado, ignorando clic');
+                return;
+            }
+        
+            // Usar event.currentTarget para referirnos a la celda clicada (más fiable)
+            const clickedCell = event && event.currentTarget ? event.currentTarget : document.querySelector(`[data-index="${index}"]`);
+            const clickedRow = Math.floor(index / size);
+            const clickedCol = index % size;
+        
+            // Si es pared (protección extra)
+            if (!labyrinth[clickedRow] || labyrinth[clickedRow][clickedCol] === 1) {
+                console.log('clic en pared o fuera de rango', clickedRow, clickedCol);
+                return;
+            }
+        
+            // Verificar adyacencia usando 'size' consistente
             if (isAdjacent(currentLabPosition, index, size)) {
-                cell.classList.add('visited');
+                // Marcar celda como visitada
+                clickedCell.classList.add('visited');
+        
+                // Actualizar posición
                 currentLabPosition = index;
-                
-                if (cell.classList.contains('end') && !gameStates.labyrinth.completed) {
+        
+                // Verificar meta
+                if (labyrinth[clickedRow][clickedCol] === 2) {
                     gameStates.labyrinth.completed = true;
-                    completedDays.add(21);
-                    updateProgress();
-                    showSuccessMessage('¡Laberinto completado!');
-                    createCelebrationParticles();
+                    // acciones cuando se completa
+                    if (typeof completedDays !== 'undefined' && completedDays.add) completedDays.add(21);
+                    if (typeof updateProgress === 'function') updateProgress();
+                    if (typeof showSuccessMessage === 'function') showSuccessMessage('¡Laberinto completado! Has encontrado el camino.');
+                    if (typeof createCelebrationParticles === 'function') createCelebrationParticles();
+                    console.log('Meta alcanzada en', clickedRow, clickedCol);
                 }
+            } else {
+                console.log('Celda no adyacente: intentaste moverte de', currentLabPosition, 'a', index);
             }
         }
-
+        
         function isAdjacent(pos1, pos2, size) {
             const row1 = Math.floor(pos1 / size);
             const col1 = pos1 % size;
@@ -1493,7 +1537,7 @@
 
         // Utility functions
         function handleDragStart(e) {
-            if (gameStates.silhouette.completed) return; // No permitir si ya completado
+            if (gameStates.silhouette.completed) return;
             e.target.classList.add('dragging');
             e.dataTransfer.setData('text/plain', '');
         }
@@ -1523,8 +1567,10 @@
             
             document.getElementById('progressFill').style.width = progress + '%';
             document.getElementById('progressText').textContent = `${completed}/${totalDays} completado`;
-            
-            // Guardar progreso
+            for (let day of completedDays) {
+                const dayButton = document.getElementById('day'+day);
+                dayButton.textContent = 'Día '+day+' ✓'; 
+            }
             localStorage.setItem('moroccanBirthdayProgress', JSON.stringify({
                 completedDays: Array.from(completedDays),
                 gameStates: gameStates
@@ -1536,10 +1582,16 @@
             if (saved) {
                 const data = JSON.parse(saved);
                 completedDays = new Set(data.completedDays);
+                const totalDays = 5;
+                const progress = (completedDays.size / totalDays) * 100;
+                document.getElementById('progressFill').style.width = progress + '%';
+                document.getElementById('progressText').textContent = `${completedDays.size}/${totalDays} completado`;
+                for (let day of completedDays) {
+                    const dayButton = document.getElementById('day'+day);
+                    dayButton.textContent = 'Día '+day+' ✓'; 
+                }
                 gameStates = data.gameStates;
                 
-                // Aplicar estados guardados
-                updateProgress();
                 restoreGameStates();
             }
         }
@@ -1578,17 +1630,14 @@
             const hint = document.getElementById(hintId);
             const allHints = document.querySelectorAll('.hint-tooltip');
             
-            // Cerrar otros hints
             allHints.forEach(h => {
                 if (h.id !== hintId) {
                     h.classList.remove('show');
                 }
             });
             
-            // Toggle hint actual
             hint.classList.toggle('show');
             
-            // Auto-hide después de 5 segundos
             if (hint.classList.contains('show')) {
                 setTimeout(() => {
                     hint.classList.remove('show');
@@ -1651,10 +1700,7 @@
             }, 4000);
         }
 
-        // GSAP animations for enhanced effects
-        // gsap.registerPlugin(); // ELIMINADO - No es necesario
-        
-        // Animate title on load
+        // GSAP animations
         gsap.from('.main-title', {
             duration: 2,
             y: -100,
@@ -1662,7 +1708,6 @@
             ease: 'bounce.out'
         });
         
-        // Animate control panel
         gsap.from('.control-panel', {
             duration: 1,
             y: 50,
@@ -1671,7 +1716,6 @@
             ease: 'power2.out'
         });
         
-        // Animate countdown
         gsap.from('.countdown-section', {
             duration: 1,
             scale: 0.8,
