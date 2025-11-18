@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sorpresa de Cumpleaños - Marruecos</title>
+    <title>Sorpresa de Cumpleaños</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -12,6 +12,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
         }
 
         body {
@@ -764,7 +765,7 @@
     <div class="container">
         <header class="header">
             <h1 class="main-title">Sorpresa de Cumpleaños</h1>
-            <p class="subtitle">Un viaje mágico a Marruecos te espera</p>
+            <p class="subtitle">Una aventura mágica te espera</p>
         </header>
 
         <!-- Control Panel -->
@@ -774,7 +775,7 @@
             </div>
             <h3 style="margin-bottom: 20px; color: #8B4513;">Selector de Días</h3>
             <div class="day-selector">
-                <button class="day-button active" onclick="selectDay(19)" id="day19">Día 19</button>
+                <button class="day-button" onclick="selectDay(19)" id="day19">Día 19</button>
                 <button class="day-button locked" onclick="selectDay(20)" id="day20">Día 20</button>
                 <button class="day-button locked" onclick="selectDay(21)" id="day21">Día 21</button>
                 <button class="day-button locked" onclick="selectDay(22)" id="day22">Día 22</button>
@@ -813,7 +814,7 @@
         <!-- Games Grid -->
         <div class="games-grid">
             <!-- Game 1: Mosaico Mágico Avanzado -->
-            <div class="game-card active" id="game19">
+            <div class="game-card" id="game19">
                 <button class="hint-button" onclick="toggleHint('hint19')">?</button>
                 <div class="hint-tooltip" id="hint19">Rota las piezas hasta formar el patrón completo. Cada pieza tiene 4 orientaciones posibles.</div>
                 <h3 class="game-title">Mosaico Mágico</h3>
@@ -883,25 +884,13 @@
                     <div class="revelation-advanced">
                         <div class="treasure-chest" id="treasureChest"></div>
                         <div class="revelation-content" id="revelationContent">
-                            <h2 style="color: #8B4513; font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 20px;">¡Nos vamos a Marruecos!</h2>
-                            <p style="color: #654321; font-size: 1.1rem; margin-bottom: 30px;">Tu aventura te espera en la tierra de las especias y los misterios</p>
+                            <h2 style="color: #8B4513; font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 20px;">¡Gran Sorpresa!</h2>
+                            <p style="color: #654321; font-size: 1.1rem; margin-bottom: 30px;">Tu aventura te espera</p>
                             <div class="photo-gallery" id="photoGallery">
                                 <div class="photo-slot" onclick="addPhoto(1)">📷</div>
                                 <div class="photo-slot" onclick="addPhoto(2)">📷</div>
                                 <div class="photo-slot" onclick="addPhoto(3)">📷</div>
                                 <div class="photo-slot" onclick="addPhoto(4)">📷</div>
-                            </div>
-                            <div style="margin-top: 20px;">
-                                <label for="travelDate" style="display: block; margin-bottom: 10px; color: #8B4513; font-weight: 600;">Selecciona la fecha del viaje:</label>
-                                <select id="travelDate" style="padding: 12px 20px; border: 2px solid #D2691E; border-radius: 10px; background: white; color: #8B4513; font-size: 1rem; cursor: pointer;">
-                                    <option value="">Elige una fecha...</option>
-                                    <option value="2025-04-15">Abril 15, 2025</option>
-                                    <option value="2025-04-22">Abril 22, 2025</option>
-                                    <option value="2025-04-29">Abril 29, 2025</option>
-                                    <option value="2025-05-06">Mayo 6, 2025</option>
-                                    <option value="2025-05-13">Mayo 13, 2025</option>
-                                    <option value="2025-05-20">Mayo 20, 2025</option>
-                                </select>
                             </div>
                         </div>
                     </div>
@@ -918,7 +907,7 @@
 
     <script>
         // Global variables
-        let currentDay = 19;
+        let currentDay = null;
         let completedDays = new Set();
         let gameStates = {
             mosaic: { completed: false, progress: 0 },
@@ -928,6 +917,7 @@
             revelation: { completed: false }
         };
         let testMode = false;
+        let currentLabPosition = 0;
 
         const targetDate = new Date('2025-11-23T00:00:00');
 
@@ -935,9 +925,22 @@
         document.addEventListener('DOMContentLoaded', function() {
             initializeCountdown();
             initializeGames();
-            selectDay(19);
             loadProgress();
+            updateDayLocks();
+            selectInitialDay();
         });
+
+        function selectInitialDay() {
+            let initialDay = 19;
+            for (let d = 19; d <= 23; d++) {
+                const button = document.getElementById(`day${d}`);
+                if (!button.classList.contains('locked')) {
+                    initialDay = d;
+                    break;
+                }
+            }
+            selectDay(initialDay);
+        }
 
         // Test Mode Functionality
         function toggleTestMode() {
@@ -1002,9 +1005,8 @@
 
         // Day selection functionality
         function selectDay(day) {
-            // Check if day is available
             const today = new Date().getDate();
-            const isAvailable = day <= today || completedDays.has(day) || day === 19 || testMode;
+            const isAvailable = day <= today || completedDays.has(day) || testMode;
             
             if (!isAvailable) {
                 showSuccessMessage('Este día aún no está disponible. ¡Vuelve mañana!');
@@ -1039,7 +1041,7 @@
             
             for (let day = 19; day <= 23; day++) {
                 const button = document.getElementById(`day${day}`);
-                const isAvailable = day <= today || completedDays.has(day) || day === 19;
+                const isAvailable = day <= today || completedDays.has(day);
                 
                 if (isAvailable) {
                     button.classList.remove('locked');
@@ -1248,6 +1250,7 @@
                 } else if (labyrinth[row][col] === 0 && i === 0) {
                     cell.classList.add('start');
                     cell.textContent = '🏁';
+                    cell.classList.add('visited');
                 } else if (labyrinth[row][col] === 2) {
                     cell.classList.add('end');
                     cell.textContent = '🏆';
@@ -1255,7 +1258,7 @@
                 
                 if (!cell.classList.contains('wall')) {
                     cell.addEventListener('click', function() {
-                        handleLabyrinthAdvancedClick(i, labyrinth);
+                        handleLabyrinthAdvancedClick(i, labyrinth, size);
                     });
                 }
                 
@@ -1263,48 +1266,18 @@
             }
         }
 
-        function handleLabyrinthAdvancedClick(index, labyrinth) {
+        function handleLabyrinthAdvancedClick(index, labyrinth, size) {
             const cell = document.querySelector(`[data-index="${index}"]`);
-            const size = 8;
             const row = Math.floor(index / size);
             const col = index % size;
             
             if (labyrinth[row][col] === 1) return; // Can't click walls
             
-            // Simple pathfinding logic
-            if (cell.classList.contains('start')) {
-                // Start pathfinding
-                findLabyrinthPath(index, labyrinth);
-            }
-        }
-
-        function findLabyrinthPath(startIndex, labyrinth) {
-            const size = 8;
-            const queue = [startIndex];
-            const visited = new Set();
-            const parent = {};
-            
-            visited.add(startIndex);
-            
-            while (queue.length > 0) {
-                const current = queue.shift();
-                const row = Math.floor(current / size);
-                const col = current % size;
+            if (isAdjacent(currentLabPosition, index, size)) {
+                cell.classList.add('visited');
+                currentLabPosition = index;
                 
-                // Check if reached end
-                if (labyrinth[row][col] === 2) {
-                    // Reconstruct path
-                    const path = [];
-                    let node = current;
-                    while (node !== startIndex) {
-                        path.push(node);
-                        node = parent[node];
-                    }
-                    path.push(startIndex);
-                    path.reverse();
-                    
-                    // Animate path
-                    animateLabyrinthPath(path);
+                if (cell.classList.contains('end')) {
                     gameStates.labyrinth.completed = true;
                     completedDays.add(21);
                     updateProgress();
@@ -1313,39 +1286,16 @@
                     }
                     showSuccessMessage('¡Laberinto completado! Has desbloqueado el día 22.');
                     createCelebrationParticles();
-                    return;
                 }
-                
-                // Check neighbors
-                const neighbors = [
-                    current - size, // up
-                    current + size, // down
-                    current - 1,    // left
-                    current + 1     // right
-                ];
-                
-                neighbors.forEach(neighbor => {
-                    const nRow = Math.floor(neighbor / size);
-                    const nCol = neighbor % size;
-                    
-                    if (neighbor >= 0 && neighbor < size * size && 
-                        !visited.has(neighbor) && 
-                        labyrinth[nRow][nCol] !== 1) {
-                        visited.add(neighbor);
-                        parent[neighbor] = current;
-                        queue.push(neighbor);
-                    }
-                });
             }
         }
 
-        function animateLabyrinthPath(path) {
-            path.forEach((index, i) => {
-                setTimeout(() => {
-                    const cell = document.querySelector(`[data-index="${index}"]`);
-                    cell.classList.add('path');
-                }, i * 100);
-            });
+        function isAdjacent(pos1, pos2, size) {
+            const row1 = Math.floor(pos1 / size);
+            const col1 = pos1 % size;
+            const row2 = Math.floor(pos2 / size);
+            const col2 = pos2 % size;
+            return Math.abs(row1 - row2) + Math.abs(col1 - col2) === 1;
         }
 
         // Game 4: Advanced Spice Puzzle
@@ -1454,7 +1404,7 @@
                     gameStates.revelation.completed = true;
                     completedDays.add(23);
                     updateProgress();
-                    showSuccessMessage('¡Felicidades! Has completado todos los desafíos. ¡Nos vamos a Marruecos! 🇲🇦');
+                    showSuccessMessage('¡Felicidades! Has completado todos los desafíos. ¡Disfruta tu sorpresa!');
                     createCelebrationParticles();
                     
                     // Final celebration
