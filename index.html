@@ -157,8 +157,9 @@
         }
 
         .day-button.active {
-            background: linear-gradient(135deg, #32CD32, #228B22);
-            box-shadow: 0 0 20px rgba(50, 205, 50, 0.4);
+            background: linear-gradient(135deg, #D2691E, #F4A460)!important;
+            /*box-shadow: 0 0 20px #8b4513;*/
+            /*border: 2px solid #8b451300;*/
         }
 
         .day-button.locked {
@@ -689,6 +690,42 @@
             color: #654321;
             font-size: 1.1rem;
         }
+        
+        /* Info Messages */
+        .info-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 3px solid #8b451375;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            max-width: 400px;
+        }
+
+        .info-message.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .info-message h3 {
+            font-family: 'Playfair Display', serif;
+            color: #8B4513;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .info-message p {
+            color: #654321;
+            font-size: 1.1rem;
+        }
 
         /* Particle Effects */
         .particle {
@@ -745,27 +782,29 @@
             }
             
             .mosaic-advanced {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(5, 1fr);
                 max-width: 280px;
+                gap: 5px;
             }
             
             .mosaic-tile {
-                width: 60px;
-                height: 60px;
+                width: 50px;
+                height: 50px;
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
     <!-- Test Mode Button -->
-    <button class="test-mode-button" onclick="toggleTestMode()" id="testModeButton">
+    <button class="test-mode-button" onclick="toggleTestMode()" id="testModeButton" aria-pressed="false" aria-label="Alternar modo test">
         🧪 MODO TEST
     </button>
     
     <div class="container">
         <header class="header">
             <h1 class="main-title">Sorpresa de Cumpleaños</h1>
-            <p class="subtitle">Una aventura mágica te espera</p>
+            <p class="subtitle">Un regalo mágico te espera</p>
         </header>
 
         <!-- Control Panel -->
@@ -775,11 +814,11 @@
             </div>
             <h3 style="margin-bottom: 20px; color: #8B4513;">Selector de Días</h3>
             <div class="day-selector">
-                <button class="day-button" onclick="selectDay(19)" id="day19">Día 19</button>
-                <button class="day-button locked" onclick="selectDay(20)" id="day20">Día 20</button>
-                <button class="day-button locked" onclick="selectDay(21)" id="day21">Día 21</button>
-                <button class="day-button locked" onclick="selectDay(22)" id="day22">Día 22</button>
-                <button class="day-button locked" onclick="selectDay(23)" id="day23">Día 23</button>
+                <button class="day-button locked" onclick="selectDay(19)" id="day19" aria-disabled="true" aria-label="Día 19, bloqueado">Día 19</button>
+                <button class="day-button locked" onclick="selectDay(20)" id="day20" aria-disabled="true" aria-label="Día 20, bloqueado">Día 20</button>
+                <button class="day-button locked" onclick="selectDay(21)" id="day21" aria-disabled="true" aria-label="Día 21, bloqueado">Día 21</button>
+                <button class="day-button locked" onclick="selectDay(22)" id="day22" aria-disabled="true" aria-label="Día 22, bloqueado">Día 22</button>
+                <button class="day-button locked" onclick="selectDay(23)" id="day23" aria-disabled="true" aria-label="Día 23, bloqueado">Día 23</button>
             </div>
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
@@ -815,13 +854,12 @@
         <div class="games-grid">
             <!-- Game 1: Mosaico Mágico Avanzado -->
             <div class="game-card" id="game19">
-                <button class="hint-button" onclick="toggleHint('hint19')">?</button>
+                <button class="hint-button" onclick="toggleHint('hint19')" aria-label="Mostrar ayuda mosaico">?</button>
                 <div class="hint-tooltip" id="hint19">Rota las piezas hasta formar el patrón completo. Cada pieza tiene 4 orientaciones posibles.</div>
                 <h3 class="game-title">Mosaico Mágico</h3>
                 <p class="game-date">Día 19 - Noviembre</p>
                 <div class="game-content">
                     <div class="mosaic-advanced" id="mosaicAdvanced">
-                        <!-- Advanced mosaic pieces will be generated -->
                     </div>
                     <div class="progress-bar">
                         <div class="progress-fill" id="mosaicProgress"></div>
@@ -831,13 +869,12 @@
 
             <!-- Game 2: Siluetas del Zoco Mejorado -->
             <div class="game-card" id="game20">
-                <button class="hint-button" onclick="toggleHint('hint20')">?</button>
+                <button class="hint-button" onclick="toggleHint('hint20')" aria-label="Mostrar ayuda siluetas">?</button>
                 <div class="hint-tooltip" id="hint20">Arrastra los objetos a sus siluetas correspondientes. Presta atención a los detalles!</div>
                 <h3 class="game-title">Siluetas del Zoco</h3>
                 <p class="game-date">Día 20 - Noviembre</p>
                 <div class="game-content">
                     <div class="silhouette-advanced" id="silhouetteAdvanced">
-                        <!-- Advanced silhouette game will be generated -->
                     </div>
                     <div class="progress-bar">
                         <div class="progress-fill" id="silhouetteProgress"></div>
@@ -847,26 +884,24 @@
 
             <!-- Game 3: Laberinto de Luz Avanzado -->
             <div class="game-card" id="game21">
-                <button class="hint-button" onclick="toggleHint('hint21')">?</button>
+                <button class="hint-button" onclick="toggleHint('hint21')" aria-label="Mostrar ayuda laberinto">?</button>
                 <div class="hint-tooltip" id="hint21">Encuentra el camino desde el inicio hasta el final. Las paredes te bloquean el paso.</div>
                 <h3 class="game-title">Laberinto de Luz</h3>
                 <p class="game-date">Día 21 - Noviembre</p>
                 <div class="game-content">
                     <div class="labyrinth-advanced" id="labyrinthAdvanced">
-                        <!-- Advanced labyrinth will be generated -->
                     </div>
                 </div>
             </div>
 
             <!-- Game 4: Puzzle de Especias Complejo -->
             <div class="game-card" id="game22">
-                <button class="hint-button" onclick="toggleHint('hint22')">?</button>
+                <button class="hint-button" onclick="toggleHint('hint22')" aria-label="Mostrar ayuda especias">?</button>
                 <div class="hint-tooltip" id="hint22">Cada especia debe ir en su lugar correcto según las reglas del puzzle. ¡Piensa lógicamente!</div>
                 <h3 class="game-title">Puzzle de Especias</h3>
                 <p class="game-date">Día 22 - Noviembre</p>
                 <div class="game-content">
                     <div class="spice-puzzle" id="spicePuzzle">
-                        <!-- Advanced spice puzzle will be generated -->
                     </div>
                     <div class="progress-bar">
                         <div class="progress-fill" id="spiceProgress"></div>
@@ -876,21 +911,21 @@
 
             <!-- Game 5: Gran Revelación Mejorada -->
             <div class="game-card" id="game23">
-                <button class="hint-button" onclick="toggleHint('hint23')">?</button>
+                <button class="hint-button" onclick="toggleHint('hint23')" aria-label="Mostrar ayuda revelación">?</button>
                 <div class="hint-tooltip" id="hint23">Haz clic en el cofre para descubrir la gran sorpresa. ¡El viaje te espera!</div>
                 <h3 class="game-title">Gran Revelación</h3>
                 <p class="game-date">Día 23 - Noviembre</p>
                 <div class="game-content">
                     <div class="revelation-advanced">
-                        <div class="treasure-chest" id="treasureChest"></div>
+                        <div class="treasure-chest" id="treasureChest" role="button" aria-label="Cofre del tesoro"></div>
                         <div class="revelation-content" id="revelationContent">
                             <h2 style="color: #8B4513; font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 20px;">¡Gran Sorpresa!</h2>
                             <p style="color: #654321; font-size: 1.1rem; margin-bottom: 30px;">Tu aventura te espera</p>
                             <div class="photo-gallery" id="photoGallery">
-                                <div class="photo-slot" onclick="addPhoto(1)">📷</div>
-                                <div class="photo-slot" onclick="addPhoto(2)">📷</div>
-                                <div class="photo-slot" onclick="addPhoto(3)">📷</div>
-                                <div class="photo-slot" onclick="addPhoto(4)">📷</div>
+                                <div class="photo-slot" onclick="addPhoto(1)" role="button" aria-label="Añadir foto 1">📷</div>
+                                <div class="photo-slot" onclick="addPhoto(2)" role="button" aria-label="Añadir foto 2">📷</div>
+                                <div class="photo-slot" onclick="addPhoto(3)" role="button" aria-label="Añadir foto 3">📷</div>
+                                <div class="photo-slot" onclick="addPhoto(4)" role="button" aria-label="Añadir foto 4">📷</div>
                             </div>
                         </div>
                     </div>
@@ -900,9 +935,15 @@
     </div>
 
     <!-- Success Message Modal -->
-    <div class="success-message" id="successMessage">
+    <div class="success-message" id="successMessage" role="dialog" aria-labelledby="successText">
         <h3>¡Felicitaciones!</h3>
         <p id="successText">Has completado el desafío</p>
+    </div>
+    
+     <!-- Success Message Modal -->
+    <div class="info-message" id="infoMessage" role="dialog" aria-labelledby="successText">
+        <h3>¡Hola!</h3>
+        <p id="infoText">Has completado el desafío</p>
     </div>
 
     <script>
@@ -918,8 +959,18 @@
         };
         let testMode = false;
         let currentLabPosition = 0;
+        let finalCelebrationShown = false; // Control para celebración final única
 
         const targetDate = new Date('2025-11-23T00:00:00');
+
+        // Mapeo día-juego
+        const dayToGame = {
+            19: 'mosaic',
+            20: 'silhouette',
+            21: 'labyrinth',
+            22: 'spices',
+            23: 'revelation'
+        };
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
@@ -928,18 +979,25 @@
             loadProgress();
             updateDayLocks();
             selectInitialDay();
+            // Cerrar hints al hacer clic fuera
+            document.addEventListener('click', handleClickOutside);
         });
 
         function selectInitialDay() {
-            let initialDay = 19;
-            for (let d = 19; d <= 23; d++) {
-                const button = document.getElementById(`day${d}`);
-                if (!button.classList.contains('locked')) {
-                    initialDay = d;
-                    break;
+            const today = new Date().getDate();
+            
+            if (testMode) {
+                // En modo test, siempre empezar en día 19
+                selectDay(19);
+            } else {
+                // En modo normal, solo si es un día válido
+                if (today >= 19 && today <= 23) {
+                    selectDay(today);
+                } else {
+                    // Mostrar mensaje si no hay día disponible
+                    showInfoMessage('Ningún día disponible aún. ¡Vuelve el 19 de noviembre!');
                 }
             }
-            selectDay(initialDay);
         }
 
         // Test Mode Functionality
@@ -948,27 +1006,32 @@
             const button = document.getElementById('testModeButton');
             const indicator = document.getElementById('modeIndicator');
             
+            button.setAttribute('aria-pressed', testMode);
+            
             if (testMode) {
                 button.textContent = '🔒 SALIR TEST';
                 button.classList.add('active');
                 indicator.textContent = 'Modo Test';
                 indicator.classList.add('test-mode');
                 
-                // Unlock all days
+                // Desbloquear todos los días
                 document.querySelectorAll('.day-button').forEach(btn => {
                     btn.classList.remove('locked');
+                    btn.setAttribute('aria-disabled', 'false');
                 });
                 
-                showSuccessMessage('🧪 Modo TEST activado - Todos los juegos desbloqueados!');
+                showInfoMessage('🧪 Modo TEST activado - Todos los juegos desbloqueados!');
+                selectDay(19); // Siempre iniciar en día 19 en test
             } else {
                 button.textContent = '🧪 MODO TEST';
                 button.classList.remove('active');
                 indicator.textContent = 'Modo Normal';
                 indicator.classList.remove('test-mode');
                 
-                // Restore normal mode locks
+                // Restaurar bloqueos según fecha
                 updateDayLocks();
-                showSuccessMessage('🔒 Modo TEST desactivado - Regreso al modo normal');
+                showInfoMessage('🔒 Modo TEST desactivado - Regreso al modo normal');
+                selectInitialDay();
             }
             
             createCelebrationParticles();
@@ -1006,32 +1069,49 @@
         // Day selection functionality
         function selectDay(day) {
             const today = new Date().getDate();
-            const isAvailable = day <= today || completedDays.has(day) || testMode;
+            const isAvailable = (day === today) || testMode;
             
             if (!isAvailable) {
-                showSuccessMessage('Este día aún no está disponible. ¡Vuelve mañana!');
+                showInfoMessage('Este día aún no está disponible. ¡Vuelve en la fecha correspondiente!');
                 return;
             }
 
             currentDay = day;
             
-            // Update day buttons
+            // Resetear posición del laberinto si se selecciona día 21
+            if (day === 21) {
+                currentLabPosition = 0;
+                resetLabyrinth();
+            }
+            
+            // Actualizar botones
             document.querySelectorAll('.day-button').forEach(btn => {
                 btn.classList.remove('active');
+                btn.setAttribute('aria-pressed', 'false');
             });
-            document.getElementById(`day${day}`).classList.add('active');
+            const activeButton = document.getElementById(`day${day}`);
+            activeButton.classList.add('active');
+            activeButton.setAttribute('aria-pressed', 'true');
             
-            // Show corresponding game
+            // Mostrar juego correspondiente
             document.querySelectorAll('.game-card').forEach(card => {
                 card.classList.remove('active');
             });
             document.getElementById(`game${day}`).classList.add('active');
-            
-            // Unlock next day if current is completed
-            if (completedDays.has(day) && day < 23 && !testMode) {
-                const nextDay = day + 1;
-                const nextButton = document.getElementById(`day${nextDay}`);
-                nextButton.classList.remove('locked');
+        }
+
+        // Resetear visualización del laberinto
+        function resetLabyrinth() {
+            const cells = document.querySelectorAll('.labyrinth-cell-advanced');
+            cells.forEach(cell => {
+                if (!cell.classList.contains('start') && !cell.classList.contains('end') && !cell.classList.contains('wall')) {
+                    cell.classList.remove('visited');
+                }
+            });
+            // Marcar celda inicial como visitada
+            const startCell = document.querySelector('.labyrinth-cell-advanced.start');
+            if (startCell) {
+                startCell.classList.add('visited');
             }
         }
 
@@ -1041,12 +1121,14 @@
             
             for (let day = 19; day <= 23; day++) {
                 const button = document.getElementById(`day${day}`);
-                const isAvailable = day <= today || completedDays.has(day);
+                const isAvailable = (day === today); // Solo el día exacto
                 
                 if (isAvailable) {
                     button.classList.remove('locked');
+                    button.setAttribute('aria-disabled', 'false');
                 } else {
                     button.classList.add('locked');
+                    button.setAttribute('aria-disabled', 'true');
                 }
             }
         }
@@ -1071,7 +1153,6 @@
                 '✨', '💫', '🌟', '⭐', '🌠'
             ];
             
-            // Create complex mosaic pattern
             const solutionPattern = [
                 [0, 1, 2, 3, 4],
                 [5, 6, 7, 8, 9],
@@ -1087,7 +1168,6 @@
                 tile.dataset.rotation = '0';
                 tile.dataset.correctRotation = Math.floor(Math.random() * 4) * 90;
                 
-                // Create scrambled pattern
                 const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
                 tile.textContent = randomPattern;
                 tile.style.background = `linear-gradient(${Math.random() * 360}deg, #8B4513, #D2691E, #F4A460)`;
@@ -1101,6 +1181,8 @@
         }
 
         function rotateMosaicTile(tile, solution) {
+            if (gameStates.mosaic.completed) return; // No permitir si ya completado
+            
             const currentRotation = parseInt(tile.dataset.rotation);
             const newRotation = (currentRotation + 90) % 360;
             
@@ -1130,14 +1212,11 @@
             document.getElementById('mosaicProgress').style.width = progress + '%';
             gameStates.mosaic.progress = progress;
             
-            if (correctCount === tiles.length) {
+            if (correctCount === tiles.length && !gameStates.mosaic.completed) {
                 gameStates.mosaic.completed = true;
                 completedDays.add(19);
                 updateProgress();
-                if (!testMode) {
-                    unlockNextDay(19);
-                }
-                showSuccessMessage('¡Mosaico mágico completado! Has desbloqueado el día 20.');
+                showSuccessMessage('¡Mosaico mágico completado!');
                 createCelebrationParticles();
             }
         }
@@ -1154,7 +1233,6 @@
                 { emoji: '🧿', name: 'eye', shape: 'oval' }
             ];
             
-            // Shuffle objects
             const shuffledObjects = [...objects].sort(() => Math.random() - 0.5);
             
             objects.forEach((obj, index) => {
@@ -1198,7 +1276,6 @@
                     draggedElement.draggable = false;
                     draggedElement.style.display = 'none';
                     
-                    // Update progress
                     const correctPairs = document.querySelectorAll('.silhouette-target.correct').length;
                     const totalPairs = document.querySelectorAll('.silhouette-target').length;
                     const progress = (correctPairs / totalPairs) * 100;
@@ -1206,14 +1283,11 @@
                     document.getElementById('silhouetteProgress').style.width = progress + '%';
                     gameStates.silhouette.progress = progress;
                     
-                    if (correctPairs === totalPairs) {
+                    if (correctPairs === totalPairs && !gameStates.silhouette.completed) {
                         gameStates.silhouette.completed = true;
                         completedDays.add(20);
                         updateProgress();
-                        if (!testMode) {
-                            unlockNextDay(20);
-                        }
-                        showSuccessMessage('¡Siluetas completadas! Has desbloqueado el día 21.');
+                        showSuccessMessage('¡Siluetas completadas!');
                         createCelebrationParticles();
                     }
                 }
@@ -1225,7 +1299,6 @@
             const grid = document.getElementById('labyrinthAdvanced');
             const size = 8;
             
-            // Create labyrinth with walls and paths
             const labyrinth = [
                 [0, 1, 0, 0, 0, 0, 0, 0],
                 [0, 1, 0, 1, 1, 1, 1, 0],
@@ -1271,20 +1344,17 @@
             const row = Math.floor(index / size);
             const col = index % size;
             
-            if (labyrinth[row][col] === 1) return; // Can't click walls
+            if (labyrinth[row][col] === 1) return;
             
             if (isAdjacent(currentLabPosition, index, size)) {
                 cell.classList.add('visited');
                 currentLabPosition = index;
                 
-                if (cell.classList.contains('end')) {
+                if (cell.classList.contains('end') && !gameStates.labyrinth.completed) {
                     gameStates.labyrinth.completed = true;
                     completedDays.add(21);
                     updateProgress();
-                    if (!testMode) {
-                        unlockNextDay(21);
-                    }
-                    showSuccessMessage('¡Laberinto completado! Has desbloqueado el día 22.');
+                    showSuccessMessage('¡Laberinto completado!');
                     createCelebrationParticles();
                 }
             }
@@ -1303,7 +1373,6 @@
             const grid = document.getElementById('spicePuzzle');
             const spices = ['🌶️', '🫚', '🌿', '🧄', '🧅', '🍋', '🥥', '🌰', '🍯', '🌾', '🍃', '⚫', '🔴', '🟡', '🟤', '🟢', '⚪', '🔵', '🟣', '🟠', '🔶', '🔷', '🔸', '🔹', '🔺'];
             
-            // Create a complex pattern where no two adjacent cells have the same color family
             const solution = [
                 ['🌶️', '🫚', '🌿', '🧄', '🧅'],
                 ['🍋', '🥥', '🌰', '🍯', '🌾'],
@@ -1318,7 +1387,6 @@
                 cell.dataset.index = i;
                 cell.dataset.current = '0';
                 
-                // Start with random spices
                 const randomSpice = spices[Math.floor(Math.random() * spices.length)];
                 cell.textContent = randomSpice;
                 cell.dataset.currentSpice = randomSpice;
@@ -1332,6 +1400,8 @@
         }
 
         function cycleSpiceCell(cell, spices, solution, index) {
+            if (gameStates.spices.completed) return; // No permitir si ya completado
+            
             const currentSpice = cell.dataset.currentSpice;
             const currentIndex = spices.indexOf(currentSpice);
             const nextIndex = (currentIndex + 1) % spices.length;
@@ -1340,7 +1410,6 @@
             cell.textContent = nextSpice;
             cell.dataset.currentSpice = nextSpice;
             
-            // Check if this matches the solution
             const row = Math.floor(index / 5);
             const col = index % 5;
             
@@ -1376,14 +1445,11 @@
             document.getElementById('spiceProgress').style.width = progress + '%';
             gameStates.spices.progress = progress;
             
-            if (correctCount === cells.length) {
+            if (correctCount === cells.length && !gameStates.spices.completed) {
                 gameStates.spices.completed = true;
                 completedDays.add(22);
                 updateProgress();
-                if (!testMode) {
-                    unlockNextDay(22);
-                }
-                showSuccessMessage('¡Puzzle de especias completado! Has desbloqueado el día 23.');
+                showSuccessMessage('¡Puzzle de especias completado!');
                 createCelebrationParticles();
             }
         }
@@ -1405,11 +1471,13 @@
                     completedDays.add(23);
                     updateProgress();
                     showSuccessMessage('¡Felicidades! Has completado todos los desafíos. ¡Disfruta tu sorpresa!');
-                    createCelebrationParticles();
                     
-                    // Final celebration
+                    // Celebración final (solo una vez)
                     setTimeout(() => {
-                        createFinalCelebration();
+                        if (!finalCelebrationShown) {
+                            createFinalCelebration();
+                            finalCelebrationShown = true;
+                        }
                     }, 2000);
                 }
             });
@@ -1420,13 +1488,12 @@
             slot.classList.add('filled');
             slot.textContent = '📸';
             slot.style.background = 'linear-gradient(135deg, #32CD32, #228B22)';
-            
-            // Add photo animation
             slot.style.animation = 'correctTile 0.6s ease-out';
         }
 
         // Utility functions
         function handleDragStart(e) {
+            if (gameStates.silhouette.completed) return; // No permitir si ya completado
             e.target.classList.add('dragging');
             e.dataTransfer.setData('text/plain', '');
         }
@@ -1439,17 +1506,14 @@
             e.preventDefault();
         }
 
-        function unlockNextDay(currentDay) {
-            if (currentDay < 23) {
-                const nextDay = currentDay + 1;
-                const nextButton = document.getElementById(`day${nextDay}`);
-                nextButton.classList.remove('locked');
-                
-                // Auto-select next day after a delay
-                setTimeout(() => {
-                    selectDay(nextDay);
-                }, 2000);
-            }
+        function handleClickOutside(e) {
+            // Cerrar hints si se hace clic fuera
+            const hints = document.querySelectorAll('.hint-tooltip.show');
+            hints.forEach(hint => {
+                if (!hint.contains(e.target) && !e.target.classList.contains('hint-button')) {
+                    hint.classList.remove('show');
+                }
+            });
         }
 
         function updateProgress() {
@@ -1460,7 +1524,7 @@
             document.getElementById('progressFill').style.width = progress + '%';
             document.getElementById('progressText').textContent = `${completed}/${totalDays} completado`;
             
-            // Save progress
+            // Guardar progreso
             localStorage.setItem('moroccanBirthdayProgress', JSON.stringify({
                 completedDays: Array.from(completedDays),
                 gameStates: gameStates
@@ -1474,31 +1538,79 @@
                 completedDays = new Set(data.completedDays);
                 gameStates = data.gameStates;
                 
-                // Update UI based on saved progress
-                completedDays.forEach(day => {
-                    const button = document.getElementById(`day${day}`);
-                    if (button) {
-                        button.classList.remove('locked');
-                    }
-                });
-                
+                // Aplicar estados guardados
                 updateProgress();
+                restoreGameStates();
+            }
+        }
+
+        function restoreGameStates() {
+            // Restaurar visualización de juegos completados
+            if (gameStates.mosaic.completed) {
+                document.querySelectorAll('.mosaic-tile').forEach(tile => {
+                    tile.classList.add('correct');
+                });
+                document.getElementById('mosaicProgress').style.width = '100%';
+            }
+            
+            if (gameStates.silhouette.completed) {
+                document.querySelectorAll('.silhouette-target').forEach(target => {
+                    target.classList.add('correct');
+                });
+                document.getElementById('silhouetteProgress').style.width = '100%';
+            }
+            
+            if (gameStates.spices.completed) {
+                document.querySelectorAll('.spice-cell-advanced').forEach(cell => {
+                    cell.classList.add('correct');
+                });
+                document.getElementById('spiceProgress').style.width = '100%';
+            }
+            
+            if (gameStates.revelation.completed) {
+                document.getElementById('treasureChest').classList.add('open');
+                document.getElementById('revelationContent').classList.add('show');
+                finalCelebrationShown = true;
             }
         }
 
         function toggleHint(hintId) {
             const hint = document.getElementById(hintId);
+            const allHints = document.querySelectorAll('.hint-tooltip');
+            
+            // Cerrar otros hints
+            allHints.forEach(h => {
+                if (h.id !== hintId) {
+                    h.classList.remove('show');
+                }
+            });
+            
+            // Toggle hint actual
             hint.classList.toggle('show');
             
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                hint.classList.remove('show');
-            }, 5000);
+            // Auto-hide después de 5 segundos
+            if (hint.classList.contains('show')) {
+                setTimeout(() => {
+                    hint.classList.remove('show');
+                }, 5000);
+            }
         }
 
         function showSuccessMessage(text) {
             const modal = document.getElementById('successMessage');
             const messageText = document.getElementById('successText');
+            
+            messageText.textContent = text;
+            modal.classList.add('show');
+            
+            setTimeout(() => {
+                modal.classList.remove('show');
+            }, 4000);
+        }
+        
+        function showInfoMessage(text) {
+            const modal = document.getElementById('infoMessage');
+            const messageText = document.getElementById('infoText');
             
             messageText.textContent = text;
             modal.classList.add('show');
@@ -1540,7 +1652,7 @@
         }
 
         // GSAP animations for enhanced effects
-        gsap.registerPlugin();
+        // gsap.registerPlugin(); // ELIMINADO - No es necesario
         
         // Animate title on load
         gsap.from('.main-title', {
