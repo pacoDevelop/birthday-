@@ -400,7 +400,7 @@
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             gap: 4px;
-            max-width: 400px;
+            max-width: 550px;
             margin: 0 auto;
             padding: 20px;
             background: rgba(139, 69, 19, 0.1);
@@ -1309,108 +1309,162 @@
         }
 
         // Game 3: Advanced Labyrinth - CORREGIDO y OPTIMIZADO
-        function initializeLabyrinthAdvanced() {
-            const grid = document.getElementById('labyrinthAdvanced');
-            const labyrinth = [
-                [0, 1, 0, 0, 0, 0, 0, 0], // Fila 0: Inicio en (0,0)
-                [0, 1, 0, 1, 1, 1, 1, 0],
-                [0, 1, 0, 1, 0, 0, 1, 0],
-                [0, 1, 1, 1, 1, 0, 1, 0],
-                [0, 0, 0, 0, 1, 0, 1, 0],
-                [1, 1, 1, 0, 1, 0, 1, 0],
-                [0, 0, 1, 0, 1, 0, 1, 0],
-                [0, 0, 0, 0, 0, 0, 0, 2]  // Fila 7: Meta en (7,7)
-            ];
-        
-            // Debe coincidir con el tamaño real del array
-            const size = labyrinth.length; // 8 en tu caso
-            grid.innerHTML = '';
-        
-            for (let i = 0; i < size * size; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'labyrinth-cell-advanced';
-                cell.dataset.index = i;
-        
-                const row = Math.floor(i / size);
-                const col = i % size;
-                const cellType = labyrinth[row][col];
-        
-                if (cellType === 1) {
-                    cell.classList.add('wall');
-                } else if (cellType === 2) {
-                    cell.classList.add('end');
-                    cell.textContent = '🏆';
-                } else if (row === 0 && col === 0) {
-                    cell.classList.add('start');
-                    cell.textContent = '🏁';
-                    cell.classList.add('visited'); // opcional
-                }
-        
-                // Añadimos listener solo si no es pared
-                if (cellType !== 1) {
-                    // pasar labyrinth y size al handler, y el evento para usar currentTarget
-                    cell.addEventListener('click', (e) => handleLabyrinthClick(i, labyrinth, size, e));
-                }
-        
-                grid.appendChild(cell);
-            }
-        
-            // Inicializar posición global
-            currentLabPosition = 0;
-            // Asegurar estado del juego
-            if (!gameStates) gameStates = {};
-            if (!gameStates.labyrinth) gameStates.labyrinth = { completed: false };
+        // Inicializa y renderiza el laberinto (funciona para rectángulos)
+function initializeLabyrinthAdvanced() {
+    const grid = document.getElementById('labyrinthAdvanced');
+    if (!grid) {
+        console.error('No existe el elemento #labyrinthAdvanced');
+        return;
+    }
+
+    // Tu laberinto (puedes cambiar tamaño/filas)
+    const labyrinth = [
+         [0, 0, 0, 1, 0, 0, 0,0,0,0], 
+[1, 1, 0, 1, 0, 1, 0,1,1,0], 
+[0, 1, 0, 1, 0, 1, 0,1,0,0],
+[0, 0, 0, 0, 0, 1, 0,1,0,1],
+[1, 1, 1, 1, 0, 1, 0,1,0,1],
+[0, 0, 0, 1, 0, 0, 0,1,0,0],
+[0, 1, 0, 1, 1, 1, 1,1,1,0],
+[0, 1, 0, 0, 0, 1, 0,1,0,0],
+[0, 1, 1, 1, 0, 0, 1,1,0,1],
+[0, 0, 0, 0, 0, 0, 0,0,0,1],
+[0, 1, 1, 0, 1, 1, 1,1,0,1],
+[0, 0, 1, 0, 0, 0, 0,1,0,0],
+[0, 1, 1, 1, 1, 1, 0,1,1,0],
+[0, 1, 0, 0, 0, 0, 0,1,0,0],
+[0, 1, 0, 1, 1, 1, 1,1,0,1],
+[0, 1, 0, 0, 0, 0, 2,0,1,1]
+    ];
+    
+    
+
+    // Normalizar dimensiones: filas reales y columnas máximas
+    const rows = labyrinth.length;
+    const cols = Math.max(...labyrinth.map(r => r.length));
+
+    // Asegurar que cada fila tenga longitud 'cols' (rellenar con muros si hiciera falta)
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            if (typeof labyrinth[r][c] === 'undefined') labyrinth[r][c] = 1;
         }
-        
-        function handleLabyrinthClick(index, labyrinth, size, event) {
-            // Debug rápido
-            console.log('click index', index, 'size param', size, 'labyrinthSize(global?)', typeof labyrinthSize !== 'undefined' ? labyrinthSize : 'undefined');
-            if (gameStates.labyrinth && gameStates.labyrinth.completed) {
-                console.log('Juego ya completado, ignorando clic');
-                return;
-            }
-        
-            // Usar event.currentTarget para referirnos a la celda clicada (más fiable)
-            const clickedCell = event && event.currentTarget ? event.currentTarget : document.querySelector(`[data-index="${index}"]`);
-            const clickedRow = Math.floor(index / size);
-            const clickedCol = index % size;
-        
-            // Si es pared (protección extra)
-            if (!labyrinth[clickedRow] || labyrinth[clickedRow][clickedCol] === 1) {
-                console.log('clic en pared o fuera de rango', clickedRow, clickedCol);
-                return;
-            }
-        
-            // Verificar adyacencia usando 'size' consistente
-            if (isAdjacent(currentLabPosition, index, size)) {
-                // Marcar celda como visitada
-                clickedCell.classList.add('visited');
-        
-                // Actualizar posición
-                currentLabPosition = index;
-        
-                // Verificar meta
-                if (labyrinth[clickedRow][clickedCol] === 2) {
-                    gameStates.labyrinth.completed = true;
-                    // acciones cuando se completa
-                    if (typeof completedDays !== 'undefined' && completedDays.add) completedDays.add(21);
-                    if (typeof updateProgress === 'function') updateProgress();
-                    if (typeof showSuccessMessage === 'function') showSuccessMessage('¡Laberinto completado! Has encontrado el camino.');
-                    if (typeof createCelebrationParticles === 'function') createCelebrationParticles();
-                    console.log('Meta alcanzada en', clickedRow, clickedCol);
+    }
+
+    // Estilo del grid para que cuadre visualmente
+    grid.innerHTML = '';
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    grid.style.gap = '4px'; // opcional
+
+    // Buscar posición inicial válida (si (0,0) no fuera caminable)
+    let startIndex = 0;
+    if (labyrinth[0][0] === 1) {
+        let found = false;
+        for (let r = 0; r < rows && !found; r++) {
+            for (let c = 0; c < cols && !found; c++) {
+                if (labyrinth[r][c] === 0) {
+                    startIndex = r * cols + c;
+                    found = true;
                 }
+            }
+        }
+        if (!found) {
+            console.error('No hay celdas caminables en el laberinto.');
+            return;
+        }
+    }
+
+    // Renderizar celdas
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const index = row * cols + col;
+            const cell = document.createElement('div');
+            cell.className = 'labyrinth-cell-advanced';
+            cell.dataset.index = index;
+            cell.style.minHeight = '28px'; // útil para ver las celdas, ajustar CSS a tu gusto
+            cell.style.display = 'flex';
+            cell.style.alignItems = 'center';
+            cell.style.justifyContent = 'center';
+            cell.style.userSelect = 'none';
+
+            const cellType = labyrinth[row][col];
+
+            if (cellType === 1) {
+                cell.classList.add('wall');
+                // opcional: estilo rápido si no tienes CSS
+                // cell.style.background = '#333';
+            } else if (cellType === 2) {
+                cell.classList.add('end');
+                cell.textContent = '🏆';
+            } else if (index === startIndex) {
+                cell.classList.add('start');
+                cell.textContent = '🏁';
+                cell.classList.add('visited');
+            }
+
+            if (cellType !== 1) {
+                // paso cols para cálculos correctos en handlers
+                cell.addEventListener('click', (e) => handleLabyrinthClick(index, labyrinth, cols, e));
+                // accesible mediante teclado si quieres (opcional)
+                cell.tabIndex = 0;
             } else {
-                console.log('Celda no adyacente: intentaste moverte de', currentLabPosition, 'a', index);
+                cell.setAttribute('aria-hidden', 'true');
             }
+
+            grid.appendChild(cell);
         }
-        
-        function isAdjacent(pos1, pos2, size) {
-            const row1 = Math.floor(pos1 / size);
-            const col1 = pos1 % size;
-            const row2 = Math.floor(pos2 / size);
-            const col2 = pos2 % size;
-            return Math.abs(row1 - row2) + Math.abs(col1 - col2) === 1;
-        }
+    }
+
+    currentLabPosition = startIndex;
+    gameStates.labyrinth.completed = false;
+}
+
+// Handler del click (usa cols para cálculo correcto en matrices rectangulares)
+function handleLabyrinthClick(index, labyrinth, cols, event) {
+    if (gameStates.labyrinth.completed) return;
+
+    // Safety: si no viene event, buscar el elemento por dataset
+    const clickedCell = event && event.currentTarget ? event.currentTarget : document.querySelector(`[data-index="${index}"]`);
+    if (!clickedCell) return;
+
+    const row = Math.floor(index / cols);
+    const col = index % cols;
+
+    // Si por algún motivo la celda es muro o fuera de rango
+    if (!labyrinth[row] || labyrinth[row][col] === 1) {
+        console.log('clic en pared o fuera de rango', row, col);
+        return;
+    }
+
+    // No permitir movimientos no adyacentes
+    if (!isAdjacent(currentLabPosition, index, cols)) {
+        console.log('Movimiento no adyacente:', currentLabPosition, '→', index);
+        return;
+    }
+
+    // Marcar visitada y actualizar posición
+    clickedCell.classList.add('visited');
+    currentLabPosition = index;
+
+    // Verificar meta
+    if (labyrinth[row][col] === 2) {
+        gameStates.labyrinth.completed = true;
+        console.log('Meta alcanzada en', row, col);
+        if (typeof completedDays !== 'undefined' && completedDays.add) completedDays.add(21);
+        if (typeof updateProgress === 'function') updateProgress();
+        if (typeof showSuccessMessage === 'function') showSuccessMessage('¡Laberinto completado! Has encontrado el camino.');
+        if (typeof createCelebrationParticles === 'function') createCelebrationParticles();
+    }
+}
+
+// Adyacencia correcta usando 'cols' (funciona para rectangular)
+function isAdjacent(pos1, pos2, cols) {
+    const r1 = Math.floor(pos1 / cols);
+    const c1 = pos1 % cols;
+    const r2 = Math.floor(pos2 / cols);
+    const c2 = pos2 % cols;
+    return Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1;
+}
 
         // Game 4: Advanced Spice Puzzle
         function initializeSpicePuzzle() {
