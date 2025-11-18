@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorpresa de Cumpleaños - Marruecos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 25%, #F4A460 50%, #DEB887 75%, #F5DEB3 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Moroccan Pattern Overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(210, 105, 30, 0.1) 0%, transparent 50%);
+            background-size: 100px 100px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Test Mode Button - Fixed Position */
+        .test-mode-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #FF6347, #DC143C);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .test-mode-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .test-mode-button.active {
+            background: linear-gradient(135deg, #32CD32, #228B22);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
+            50% { box-shadow: 0 5px 25px rgba(50, 205, 50, 0.4); }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .main-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 900;
+            color: #8B4513;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #654321;
+            font-weight: 300;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .mode-indicator {
+            display: inline-block;
+            background: linear-gradient(135deg, #D2691E, #F4A460);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .mode-indicator.test-mode {
+            background: linear-gradient(135deg, #32CD32, #228B22);
+        }
+
+        .day-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .day-button {
+            background: linear-gradient(135deg, #D2691E, #F4A460);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .day-button.active {
+            background: linear-gradient(135deg, #32CD32, #228B22);
+            box-shadow: 0 0 20px rgba(50, 205, 50, 0.4);
+        }
+
+        .day-button.locked {
+            background: linear-gradient(135deg, #808080, #696969);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .day-button.locked:hover {
+            transform: none;
+        }
+
+        /* Countdown Section */
+        .countdown-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 2px solid #D2691E;
+        }
+
+        .countdown-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #8B4513;
+            margin-bottom: 30px;
+        }
+
+        .countdown-display {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .countdown-item {
+            background: linear-gradient(135deg, #D2691E, #F4A460);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            min-width: 100px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .countdown-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .countdown-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .countdown-message {
+            font-size: 1.1rem;
+            color: #8B4513;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+
+        /* Games Grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border: 2px solid #D2691E;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+
+        .game-card.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .game-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: #8B4513;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .game-date {
+            text-align: center;
+            color: #D2691E;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .game-content {
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        /* Game 1: Mosaico Mágico Avanzado */
+        .mosaic-advanced {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+
+        .mosaic-tile {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .mosaic-tile:hover {
+            transform: scale(1.05);
+            border-color: #FFD700;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .mosaic-tile.correct {
+            animation: correctTile 0.6s ease-out;
+            border-color: #32CD32;
+            box-shadow: 0 0 20px rgba(50, 205, 50, 0.6);
+        }
+
+        @keyframes correctTile {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1) rotate(5deg); }
+            100% { transform: scale(1); }
+        }
+
+        /* Game 2: Siluetas del Zoco Mejorado */
+        .silhouette-advanced {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .silhouette-pair {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .silhouette-target {
+            width: 100px;
+            height: 100px;
+            border: 3px dashed #D2691E;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(210, 105, 30, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .silhouette-target.correct {
+            border-color: #32CD32;
+            background: rgba(50, 205, 50, 0.2);
+            animation: targetCorrect 0.5s ease-out;
+        }
+
+        .silhouette-target::before {
+            content: '?';
+            font-size: 2rem;
+            color: #D2691E;
+            opacity: 0.5;
+        }
+
+        .silhouette-object {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #8B4513, #D2691E);
+            border-radius: 12px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .silhouette-object:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .silhouette-object.dragging {
+            cursor: grabbing;
+            transform: rotate(10deg) scale(1.1);
+            z-index: 1000;
+        }
+
+        /* Game 3: Laberinto de Luz Avanzado */
+        .labyrinth-advanced {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(139, 69, 19, 0.1);
+            border-radius: 15px;
+        }
+
+        .labyrinth-cell-advanced {
+            width: 45px;
+            height: 45px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            position: relative;
+            background: rgba(139, 69, 19, 0.2);
+        }
+
+        .labyrinth-cell-advanced.wall {
+            background: linear-gradient(135deg, #654321, #8B4513);
+            cursor: not-allowed;
+        }
+
+        .labyrinth-cell-advanced.start {
+            background: linear-gradient(135deg, #32CD32, #228B22);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .labyrinth-cell-advanced.end {
+            background: linear-gradient(135deg, #FF6347, #DC143C);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .labyrinth-cell-advanced.path {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #8B4513;
+            animation: pathGlow 0.3s ease-out;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+        }
+
+        .labyrinth-cell-advanced.visited {
+            background: linear-gradient(135deg, #87CEEB, #4682B4);
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Game 4: Puzzle de Especias Complejo */
+        .spice-puzzle {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            max-width: 350px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .spice-cell-advanced {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #D2691E;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 1.5rem;
+        }
+
+        .spice-cell-advanced:hover {
+            transform: scale(1.05);
+            border-color: #8B4513;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .spice-cell-advanced.correct {
+            background: linear-gradient(135deg, #32CD32, #228B22);
+            color: white;
+            border-color: #228B22;
+            animation: correctSpice 0.6s ease-out;
+        }
+
+        .spice-cell-advanced.incorrect {
+            background: linear-gradient(135deg, #DC143C, #8B0000);
+            color: white;
+            border-color: #8B0000;
+            animation: incorrectSpice 0.5s ease-out;
+        }
+
+        @keyframes correctSpice {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1) rotate(360deg); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes incorrectSpice {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Game 5: Gran Revelación Mejorada */
+        .revelation-advanced {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .treasure-chest {
+            width: 200px;
+            height: 150px;
+            background: linear-gradient(135deg, #8B4513, #654321);
+            border-radius: 10px;
+            margin: 0 auto 30px;
+            position: relative;
+            cursor: pointer;
+            transition: all 1s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .treasure-chest::before {
+            content: '💎';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            opacity: 0.3;
+            transition: all 0.5s ease;
+        }
+
+        .treasure-chest.open {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.5);
+        }
+
+        .treasure-chest.open::before {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .revelation-content {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease;
+        }
+
+        .revelation-content.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .photo-slot {
+            width: 100px;
+            height: 100px;
+            border: 3px dashed #D2691E;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(210, 105, 30, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .photo-slot:hover {
+            border-color: #8B4513;
+            background: rgba(139, 69, 19, 0.1);
+        }
+
+        .photo-slot.filled {
+            border-color: #32CD32;
+            background: rgba(50, 205, 50, 0.1);
+        }
+
+        /* Hints System */
+        .hint-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #FFD700;
+            color: #8B4513;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .hint-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .hint-tooltip {
+            position: absolute;
+            top: 45px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            max-width: 200px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .hint-tooltip.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Progress Indicator */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(139, 69, 19, 0.2);
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #32CD32, #228B22);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        /* Success Messages */
+        .success-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 3px solid #32CD32;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            max-width: 400px;
+        }
+
+        .success-message.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .success-message h3 {
+            font-family: 'Playfair Display', serif;
+            color: #228B22;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .success-message p {
+            color: #654321;
+            font-size: 1.1rem;
+        }
+
+        /* Particle Effects */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #FFD700;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 4s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+            50% { transform: translateY(-30px) rotate(180deg); opacity: 0.5; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .test-mode-button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .day-selector {
+                gap: 10px;
+            }
+            
+            .day-button {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .countdown-display {
+                gap: 15px;
+            }
+            
+            .countdown-item {
+                min-width: 80px;
+                padding: 15px;
+            }
+            
+            .countdown-number {
+                font-size: 2rem;
+            }
+            
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .game-card {
+                padding: 20px;
+            }
+            
+            .mosaic-advanced {
+                grid-template-columns: repeat(4, 1fr);
+                max-width: 280px;
+            }
+            
+            .mosaic-tile {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Test Mode Button -->
+    <button class="test-mode-button" onclick="toggleTestMode()" id="testModeButton">
+        🧪 MODO TEST
+    </button>
+    
+    <div class="container">
+        <header class="header">
+            <h1 class="main-title">Sorpresa de Cumpleaños</h1>
+            <p class="subtitle">Un viaje mágico a Marruecos te espera</p>
+        </header>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="mode-indicator" id="modeIndicator">
+                Modo Normal
+            </div>
+            <h3 style="margin-bottom: 20px; color: #8B4513;">Selector de Días</h3>
+            <div class="day-selector">
+                <button class="day-button active" onclick="selectDay(19)" id="day19">Día 19</button>
+                <button class="day-button locked" onclick="selectDay(20)" id="day20">Día 20</button>
+                <button class="day-button locked" onclick="selectDay(21)" id="day21">Día 21</button>
+                <button class="day-button locked" onclick="selectDay(22)" id="day22">Día 22</button>
+                <button class="day-button locked" onclick="selectDay(23)" id="day23">Día 23</button>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p style="color: #8B4513; font-size: 0.9rem;">Progreso: <span id="progressText">0/5 completado</span></p>
+        </div>
+
+        <!-- Countdown Section -->
+        <section class="countdown-section">
+            <h2 class="countdown-title">Cuenta Regresiva</h2>
+            <div class="countdown-display" id="countdown">
+                <div class="countdown-item">
+                    <span class="countdown-number" id="days">00</span>
+                    <span class="countdown-label">Días</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="hours">00</span>
+                    <span class="countdown-label">Horas</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="minutes">00</span>
+                    <span class="countdown-label">Minutos</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="seconds">00</span>
+                    <span class="countdown-label">Segundos</span>
+                </div>
+            </div>
+            <p class="countdown-message" id="countdownMessage">Tu sorpresa estará disponible el 23 de noviembre</p>
+        </section>
+
+        <!-- Games Grid -->
+        <div class="games-grid">
+            <!-- Game 1: Mosaico Mágico Avanzado -->
+            <div class="game-card active" id="game19">
+                <button class="hint-button" onclick="toggleHint('hint19')">?</button>
+                <div class="hint-tooltip" id="hint19">Rota las piezas hasta formar el patrón completo. Cada pieza tiene 4 orientaciones posibles.</div>
+                <h3 class="game-title">Mosaico Mágico</h3>
+                <p class="game-date">Día 19 - Noviembre</p>
+                <div class="game-content">
+                    <div class="mosaic-advanced" id="mosaicAdvanced">
+                        <!-- Advanced mosaic pieces will be generated -->
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="mosaicProgress"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 2: Siluetas del Zoco Mejorado -->
+            <div class="game-card" id="game20">
+                <button class="hint-button" onclick="toggleHint('hint20')">?</button>
+                <div class="hint-tooltip" id="hint20">Arrastra los objetos a sus siluetas correspondientes. Presta atención a los detalles!</div>
+                <h3 class="game-title">Siluetas del Zoco</h3>
+                <p class="game-date">Día 20 - Noviembre</p>
+                <div class="game-content">
+                    <div class="silhouette-advanced" id="silhouetteAdvanced">
+                        <!-- Advanced silhouette game will be generated -->
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="silhouetteProgress"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 3: Laberinto de Luz Avanzado -->
+            <div class="game-card" id="game21">
+                <button class="hint-button" onclick="toggleHint('hint21')">?</button>
+                <div class="hint-tooltip" id="hint21">Encuentra el camino desde el inicio hasta el final. Las paredes te bloquean el paso.</div>
+                <h3 class="game-title">Laberinto de Luz</h3>
+                <p class="game-date">Día 21 - Noviembre</p>
+                <div class="game-content">
+                    <div class="labyrinth-advanced" id="labyrinthAdvanced">
+                        <!-- Advanced labyrinth will be generated -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 4: Puzzle de Especias Complejo -->
+            <div class="game-card" id="game22">
+                <button class="hint-button" onclick="toggleHint('hint22')">?</button>
+                <div class="hint-tooltip" id="hint22">Cada especia debe ir en su lugar correcto según las reglas del puzzle. ¡Piensa lógicamente!</div>
+                <h3 class="game-title">Puzzle de Especias</h3>
+                <p class="game-date">Día 22 - Noviembre</p>
+                <div class="game-content">
+                    <div class="spice-puzzle" id="spicePuzzle">
+                        <!-- Advanced spice puzzle will be generated -->
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="spiceProgress"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 5: Gran Revelación Mejorada -->
+            <div class="game-card" id="game23">
+                <button class="hint-button" onclick="toggleHint('hint23')">?</button>
+                <div class="hint-tooltip" id="hint23">Haz clic en el cofre para descubrir la gran sorpresa. ¡El viaje te espera!</div>
+                <h3 class="game-title">Gran Revelación</h3>
+                <p class="game-date">Día 23 - Noviembre</p>
+                <div class="game-content">
+                    <div class="revelation-advanced">
+                        <div class="treasure-chest" id="treasureChest"></div>
+                        <div class="revelation-content" id="revelationContent">
+                            <h2 style="color: #8B4513; font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 20px;">¡Nos vamos a Marruecos!</h2>
+                            <p style="color: #654321; font-size: 1.1rem; margin-bottom: 30px;">Tu aventura te espera en la tierra de las especias y los misterios</p>
+                            <div class="photo-gallery" id="photoGallery">
+                                <div class="photo-slot" onclick="addPhoto(1)">📷</div>
+                                <div class="photo-slot" onclick="addPhoto(2)">📷</div>
+                                <div class="photo-slot" onclick="addPhoto(3)">📷</div>
+                                <div class="photo-slot" onclick="addPhoto(4)">📷</div>
+                            </div>
+                            <div style="margin-top: 20px;">
+                                <label for="travelDate" style="display: block; margin-bottom: 10px; color: #8B4513; font-weight: 600;">Selecciona la fecha del viaje:</label>
+                                <select id="travelDate" style="padding: 12px 20px; border: 2px solid #D2691E; border-radius: 10px; background: white; color: #8B4513; font-size: 1rem; cursor: pointer;">
+                                    <option value="">Elige una fecha...</option>
+                                    <option value="2025-04-15">Abril 15, 2025</option>
+                                    <option value="2025-04-22">Abril 22, 2025</option>
+                                    <option value="2025-04-29">Abril 29, 2025</option>
+                                    <option value="2025-05-06">Mayo 6, 2025</option>
+                                    <option value="2025-05-13">Mayo 13, 2025</option>
+                                    <option value="2025-05-20">Mayo 20, 2025</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Message Modal -->
+    <div class="success-message" id="successMessage">
+        <h3>¡Felicitaciones!</h3>
+        <p id="successText">Has completado el desafío</p>
+    </div>
+
+    <script>
+        // Global variables
+        let currentDay = 19;
+        let completedDays = new Set();
+        let gameStates = {
+            mosaic: { completed: false, progress: 0 },
+            silhouette: { completed: false, progress: 0 },
+            labyrinth: { completed: false },
+            spices: { completed: false, progress: 0 },
+            revelation: { completed: false }
+        };
+        let testMode = false;
+
+        const targetDate = new Date('2025-11-23T00:00:00');
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCountdown();
+            initializeGames();
+            selectDay(19);
+            loadProgress();
+        });
+
+        // Test Mode Functionality
+        function toggleTestMode() {
+            testMode = !testMode;
+            const button = document.getElementById('testModeButton');
+            const indicator = document.getElementById('modeIndicator');
+            
+            if (testMode) {
+                button.textContent = '🔒 SALIR TEST';
+                button.classList.add('active');
+                indicator.textContent = 'Modo Test';
+                indicator.classList.add('test-mode');
+                
+                // Unlock all days
+                document.querySelectorAll('.day-button').forEach(btn => {
+                    btn.classList.remove('locked');
+                });
+                
+                showSuccessMessage('🧪 Modo TEST activado - Todos los juegos desbloqueados!');
+            } else {
+                button.textContent = '🧪 MODO TEST';
+                button.classList.remove('active');
+                indicator.textContent = 'Modo Normal';
+                indicator.classList.remove('test-mode');
+                
+                // Restore normal mode locks
+                updateDayLocks();
+                showSuccessMessage('🔒 Modo TEST desactivado - Regreso al modo normal');
+            }
+            
+            createCelebrationParticles();
+        }
+
+        // Countdown functionality
+        function initializeCountdown() {
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
+
+        function updateCountdown() {
+            const now = new Date();
+            const difference = targetDate - now;
+
+            if (difference > 0) {
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+                document.getElementById('days').textContent = String(days).padStart(2, '0');
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+            } else {
+                document.getElementById('countdownMessage').textContent = '¡La sorpresa está disponible! 🎉';
+                document.getElementById('days').textContent = '00';
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+            }
+        }
+
+        // Day selection functionality
+        function selectDay(day) {
+            // Check if day is available
+            const today = new Date().getDate();
+            const isAvailable = day <= today || completedDays.has(day) || day === 19 || testMode;
+            
+            if (!isAvailable) {
+                showSuccessMessage('Este día aún no está disponible. ¡Vuelve mañana!');
+                return;
+            }
+
+            currentDay = day;
+            
+            // Update day buttons
+            document.querySelectorAll('.day-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`day${day}`).classList.add('active');
+            
+            // Show corresponding game
+            document.querySelectorAll('.game-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.getElementById(`game${day}`).classList.add('active');
+            
+            // Unlock next day if current is completed
+            if (completedDays.has(day) && day < 23 && !testMode) {
+                const nextDay = day + 1;
+                const nextButton = document.getElementById(`day${nextDay}`);
+                nextButton.classList.remove('locked');
+            }
+        }
+
+        // Update day locks based on current date and progress
+        function updateDayLocks() {
+            const today = new Date().getDate();
+            
+            for (let day = 19; day <= 23; day++) {
+                const button = document.getElementById(`day${day}`);
+                const isAvailable = day <= today || completedDays.has(day) || day === 19;
+                
+                if (isAvailable) {
+                    button.classList.remove('locked');
+                } else {
+                    button.classList.add('locked');
+                }
+            }
+        }
+
+        // Initialize all games
+        function initializeGames() {
+            initializeMosaicAdvanced();
+            initializeSilhouetteAdvanced();
+            initializeLabyrinthAdvanced();
+            initializeSpicePuzzle();
+            initializeRevelationAdvanced();
+        }
+
+        // Game 1: Advanced Mosaic
+        function initializeMosaicAdvanced() {
+            const grid = document.getElementById('mosaicAdvanced');
+            const patterns = [
+                '🌟', '🌙', '☀️', '🌺', '🌸',
+                '🦋', '🐍', '🦅', '🐪', '🐫',
+                '🔮', '💎', '🏺', '🗝️', '🔱',
+                '🕌', '🏰', '🏜️', '🌊', '⛰️',
+                '✨', '💫', '🌟', '⭐', '🌠'
+            ];
+            
+            // Create complex mosaic pattern
+            const solutionPattern = [
+                [0, 1, 2, 3, 4],
+                [5, 6, 7, 8, 9],
+                [10, 11, 12, 13, 14],
+                [15, 16, 17, 18, 19],
+                [20, 21, 22, 23, 24]
+            ];
+            
+            for (let i = 0; i < 25; i++) {
+                const tile = document.createElement('div');
+                tile.className = 'mosaic-tile';
+                tile.dataset.index = i;
+                tile.dataset.rotation = '0';
+                tile.dataset.correctRotation = Math.floor(Math.random() * 4) * 90;
+                
+                // Create scrambled pattern
+                const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
+                tile.textContent = randomPattern;
+                tile.style.background = `linear-gradient(${Math.random() * 360}deg, #8B4513, #D2691E, #F4A460)`;
+                
+                tile.addEventListener('click', function() {
+                    rotateMosaicTile(tile, solutionPattern);
+                });
+                
+                grid.appendChild(tile);
+            }
+        }
+
+        function rotateMosaicTile(tile, solution) {
+            const currentRotation = parseInt(tile.dataset.rotation);
+            const newRotation = (currentRotation + 90) % 360;
+            
+            tile.style.transform = `rotate(${newRotation}deg)`;
+            tile.dataset.rotation = newRotation;
+            
+            checkMosaicAdvancedCompletion(solution);
+        }
+
+        function checkMosaicAdvancedCompletion(solution) {
+            const tiles = document.querySelectorAll('.mosaic-tile');
+            let correctCount = 0;
+            
+            tiles.forEach((tile, index) => {
+                const rotation = parseInt(tile.dataset.rotation);
+                const correctRotation = parseInt(tile.dataset.correctRotation);
+                
+                if (rotation === correctRotation) {
+                    tile.classList.add('correct');
+                    correctCount++;
+                } else {
+                    tile.classList.remove('correct');
+                }
+            });
+            
+            const progress = (correctCount / tiles.length) * 100;
+            document.getElementById('mosaicProgress').style.width = progress + '%';
+            gameStates.mosaic.progress = progress;
+            
+            if (correctCount === tiles.length) {
+                gameStates.mosaic.completed = true;
+                completedDays.add(19);
+                updateProgress();
+                if (!testMode) {
+                    unlockNextDay(19);
+                }
+                showSuccessMessage('¡Mosaico mágico completado! Has desbloqueado el día 20.');
+                createCelebrationParticles();
+            }
+        }
+
+        // Game 2: Advanced Silhouette
+        function initializeSilhouetteAdvanced() {
+            const container = document.getElementById('silhouetteAdvanced');
+            const objects = [
+                { emoji: '🏮', name: 'lamp', shape: 'round' },
+                { emoji: '🫖', name: 'teapot', shape: 'tall' },
+                { emoji: '🧺', name: 'basket', shape: 'wide' },
+                { emoji: '🕌', name: 'mosque', shape: 'tower' },
+                { emoji: '🪙', name: 'coin', shape: 'circle' },
+                { emoji: '🧿', name: 'eye', shape: 'oval' }
+            ];
+            
+            // Shuffle objects
+            const shuffledObjects = [...objects].sort(() => Math.random() - 0.5);
+            
+            objects.forEach((obj, index) => {
+                const pair = document.createElement('div');
+                pair.className = 'silhouette-pair';
+                
+                const target = document.createElement('div');
+                target.className = 'silhouette-target';
+                target.dataset.shape = obj.name;
+                
+                const object = document.createElement('div');
+                object.className = 'silhouette-object';
+                object.textContent = shuffledObjects[index].emoji;
+                object.dataset.shape = shuffledObjects[index].name;
+                object.draggable = true;
+                
+                object.addEventListener('dragstart', handleDragStart);
+                object.addEventListener('dragend', handleDragEnd);
+                
+                target.addEventListener('dragover', handleDragOver);
+                target.addEventListener('drop', handleSilhouetteAdvancedDrop);
+                
+                pair.appendChild(target);
+                pair.appendChild(object);
+                container.appendChild(pair);
+            });
+        }
+
+        function handleSilhouetteAdvancedDrop(e) {
+            e.preventDefault();
+            const draggedElement = document.querySelector('.dragging');
+            const targetSlot = e.target.closest('.silhouette-target');
+            
+            if (draggedElement && targetSlot) {
+                const draggedShape = draggedElement.dataset.shape;
+                const targetShape = targetSlot.dataset.shape;
+                
+                if (draggedShape === targetShape && !targetSlot.classList.contains('correct')) {
+                    targetSlot.appendChild(draggedElement);
+                    targetSlot.classList.add('correct');
+                    draggedElement.draggable = false;
+                    draggedElement.style.display = 'none';
+                    
+                    // Update progress
+                    const correctPairs = document.querySelectorAll('.silhouette-target.correct').length;
+                    const totalPairs = document.querySelectorAll('.silhouette-target').length;
+                    const progress = (correctPairs / totalPairs) * 100;
+                    
+                    document.getElementById('silhouetteProgress').style.width = progress + '%';
+                    gameStates.silhouette.progress = progress;
+                    
+                    if (correctPairs === totalPairs) {
+                        gameStates.silhouette.completed = true;
+                        completedDays.add(20);
+                        updateProgress();
+                        if (!testMode) {
+                            unlockNextDay(20);
+                        }
+                        showSuccessMessage('¡Siluetas completadas! Has desbloqueado el día 21.');
+                        createCelebrationParticles();
+                    }
+                }
+            }
+        }
+
+        // Game 3: Advanced Labyrinth
+        function initializeLabyrinthAdvanced() {
+            const grid = document.getElementById('labyrinthAdvanced');
+            const size = 8;
+            
+            // Create labyrinth with walls and paths
+            const labyrinth = [
+                [0, 1, 0, 0, 0, 0, 0, 0],
+                [0, 1, 0, 1, 1, 1, 1, 0],
+                [0, 1, 0, 1, 0, 0, 1, 0],
+                [0, 1, 1, 1, 1, 0, 1, 0],
+                [0, 0, 0, 0, 1, 0, 1, 0],
+                [1, 1, 1, 0, 1, 0, 1, 0],
+                [0, 0, 1, 0, 1, 0, 1, 0],
+                [0, 0, 0, 0, 0, 0, 0, 2]
+            ];
+            
+            for (let i = 0; i < size * size; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'labyrinth-cell-advanced';
+                cell.dataset.index = i;
+                
+                const row = Math.floor(i / size);
+                const col = i % size;
+                
+                if (labyrinth[row][col] === 1) {
+                    cell.classList.add('wall');
+                } else if (labyrinth[row][col] === 0 && i === 0) {
+                    cell.classList.add('start');
+                    cell.textContent = '🏁';
+                } else if (labyrinth[row][col] === 2) {
+                    cell.classList.add('end');
+                    cell.textContent = '🏆';
+                }
+                
+                if (!cell.classList.contains('wall')) {
+                    cell.addEventListener('click', function() {
+                        handleLabyrinthAdvancedClick(i, labyrinth);
+                    });
+                }
+                
+                grid.appendChild(cell);
+            }
+        }
+
+        function handleLabyrinthAdvancedClick(index, labyrinth) {
+            const cell = document.querySelector(`[data-index="${index}"]`);
+            const size = 8;
+            const row = Math.floor(index / size);
+            const col = index % size;
+            
+            if (labyrinth[row][col] === 1) return; // Can't click walls
+            
+            // Simple pathfinding logic
+            if (cell.classList.contains('start')) {
+                // Start pathfinding
+                findLabyrinthPath(index, labyrinth);
+            }
+        }
+
+        function findLabyrinthPath(startIndex, labyrinth) {
+            const size = 8;
+            const queue = [startIndex];
+            const visited = new Set();
+            const parent = {};
+            
+            visited.add(startIndex);
+            
+            while (queue.length > 0) {
+                const current = queue.shift();
+                const row = Math.floor(current / size);
+                const col = current % size;
+                
+                // Check if reached end
+                if (labyrinth[row][col] === 2) {
+                    // Reconstruct path
+                    const path = [];
+                    let node = current;
+                    while (node !== startIndex) {
+                        path.push(node);
+                        node = parent[node];
+                    }
+                    path.push(startIndex);
+                    path.reverse();
+                    
+                    // Animate path
+                    animateLabyrinthPath(path);
+                    gameStates.labyrinth.completed = true;
+                    completedDays.add(21);
+                    updateProgress();
+                    if (!testMode) {
+                        unlockNextDay(21);
+                    }
+                    showSuccessMessage('¡Laberinto completado! Has desbloqueado el día 22.');
+                    createCelebrationParticles();
+                    return;
+                }
+                
+                // Check neighbors
+                const neighbors = [
+                    current - size, // up
+                    current + size, // down
+                    current - 1,    // left
+                    current + 1     // right
+                ];
+                
+                neighbors.forEach(neighbor => {
+                    const nRow = Math.floor(neighbor / size);
+                    const nCol = neighbor % size;
+                    
+                    if (neighbor >= 0 && neighbor < size * size && 
+                        !visited.has(neighbor) && 
+                        labyrinth[nRow][nCol] !== 1) {
+                        visited.add(neighbor);
+                        parent[neighbor] = current;
+                        queue.push(neighbor);
+                    }
+                });
+            }
+        }
+
+        function animateLabyrinthPath(path) {
+            path.forEach((index, i) => {
+                setTimeout(() => {
+                    const cell = document.querySelector(`[data-index="${index}"]`);
+                    cell.classList.add('path');
+                }, i * 100);
+            });
+        }
+
+        // Game 4: Advanced Spice Puzzle
+        function initializeSpicePuzzle() {
+            const grid = document.getElementById('spicePuzzle');
+            const spices = ['🌶️', '🫚', '🌿', '🧄', '🧅', '🍋', '🥥', '🌰', '🍯', '🌾', '🍃', '⚫', '🔴', '🟡', '🟤', '🟢', '⚪', '🔵', '🟣', '🟠', '🔶', '🔷', '🔸', '🔹', '🔺'];
+            
+            // Create a complex pattern where no two adjacent cells have the same color family
+            const solution = [
+                ['🌶️', '🫚', '🌿', '🧄', '🧅'],
+                ['🍋', '🥥', '🌰', '🍯', '🌾'],
+                ['🍃', '⚫', '🔴', '🟡', '🟤'],
+                ['🟢', '🌶️', '🫚', '🌿', '🧄'],
+                ['🍋', '🥥', '🌰', '🍯', '🌾']
+            ];
+            
+            for (let i = 0; i < 25; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'spice-cell-advanced';
+                cell.dataset.index = i;
+                cell.dataset.current = '0';
+                
+                // Start with random spices
+                const randomSpice = spices[Math.floor(Math.random() * spices.length)];
+                cell.textContent = randomSpice;
+                cell.dataset.currentSpice = randomSpice;
+                
+                cell.addEventListener('click', function() {
+                    cycleSpiceCell(cell, spices, solution, i);
+                });
+                
+                grid.appendChild(cell);
+            }
+        }
+
+        function cycleSpiceCell(cell, spices, solution, index) {
+            const currentSpice = cell.dataset.currentSpice;
+            const currentIndex = spices.indexOf(currentSpice);
+            const nextIndex = (currentIndex + 1) % spices.length;
+            const nextSpice = spices[nextIndex];
+            
+            cell.textContent = nextSpice;
+            cell.dataset.currentSpice = nextSpice;
+            
+            // Check if this matches the solution
+            const row = Math.floor(index / 5);
+            const col = index % 5;
+            
+            if (nextSpice === solution[row][col]) {
+                cell.classList.add('correct');
+                cell.classList.remove('incorrect');
+            } else {
+                cell.classList.add('incorrect');
+                cell.classList.remove('correct');
+                setTimeout(() => {
+                    cell.classList.remove('incorrect');
+                }, 500);
+            }
+            
+            checkSpicePuzzleCompletion(solution);
+        }
+
+        function checkSpicePuzzleCompletion(solution) {
+            const cells = document.querySelectorAll('.spice-cell-advanced');
+            let correctCount = 0;
+            
+            cells.forEach((cell, index) => {
+                const row = Math.floor(index / 5);
+                const col = index % 5;
+                const currentSpice = cell.dataset.currentSpice;
+                
+                if (currentSpice === solution[row][col]) {
+                    correctCount++;
+                }
+            });
+            
+            const progress = (correctCount / cells.length) * 100;
+            document.getElementById('spiceProgress').style.width = progress + '%';
+            gameStates.spices.progress = progress;
+            
+            if (correctCount === cells.length) {
+                gameStates.spices.completed = true;
+                completedDays.add(22);
+                updateProgress();
+                if (!testMode) {
+                    unlockNextDay(22);
+                }
+                showSuccessMessage('¡Puzzle de especias completado! Has desbloqueado el día 23.');
+                createCelebrationParticles();
+            }
+        }
+
+        // Game 5: Advanced Revelation
+        function initializeRevelationAdvanced() {
+            const chest = document.getElementById('treasureChest');
+            const content = document.getElementById('revelationContent');
+            
+            chest.addEventListener('click', function() {
+                if (!gameStates.revelation.completed) {
+                    chest.classList.add('open');
+                    
+                    setTimeout(() => {
+                        content.classList.add('show');
+                    }, 500);
+                    
+                    gameStates.revelation.completed = true;
+                    completedDays.add(23);
+                    updateProgress();
+                    showSuccessMessage('¡Felicidades! Has completado todos los desafíos. ¡Nos vamos a Marruecos! 🇲🇦');
+                    createCelebrationParticles();
+                    
+                    // Final celebration
+                    setTimeout(() => {
+                        createFinalCelebration();
+                    }, 2000);
+                }
+            });
+        }
+
+        function addPhoto(slotNumber) {
+            const slot = document.querySelector(`#photoGallery .photo-slot:nth-child(${slotNumber})`);
+            slot.classList.add('filled');
+            slot.textContent = '📸';
+            slot.style.background = 'linear-gradient(135deg, #32CD32, #228B22)';
+            
+            // Add photo animation
+            slot.style.animation = 'correctTile 0.6s ease-out';
+        }
+
+        // Utility functions
+        function handleDragStart(e) {
+            e.target.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', '');
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function unlockNextDay(currentDay) {
+            if (currentDay < 23) {
+                const nextDay = currentDay + 1;
+                const nextButton = document.getElementById(`day${nextDay}`);
+                nextButton.classList.remove('locked');
+                
+                // Auto-select next day after a delay
+                setTimeout(() => {
+                    selectDay(nextDay);
+                }, 2000);
+            }
+        }
+
+        function updateProgress() {
+            const totalDays = 5;
+            const completed = completedDays.size;
+            const progress = (completed / totalDays) * 100;
+            
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `${completed}/${totalDays} completado`;
+            
+            // Save progress
+            localStorage.setItem('moroccanBirthdayProgress', JSON.stringify({
+                completedDays: Array.from(completedDays),
+                gameStates: gameStates
+            }));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('moroccanBirthdayProgress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                completedDays = new Set(data.completedDays);
+                gameStates = data.gameStates;
+                
+                // Update UI based on saved progress
+                completedDays.forEach(day => {
+                    const button = document.getElementById(`day${day}`);
+                    if (button) {
+                        button.classList.remove('locked');
+                    }
+                });
+                
+                updateProgress();
+            }
+        }
+
+        function toggleHint(hintId) {
+            const hint = document.getElementById(hintId);
+            hint.classList.toggle('show');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                hint.classList.remove('show');
+            }, 5000);
+        }
+
+        function showSuccessMessage(text) {
+            const modal = document.getElementById('successMessage');
+            const messageText = document.getElementById('successText');
+            
+            messageText.textContent = text;
+            modal.classList.add('show');
+            
+            setTimeout(() => {
+                modal.classList.remove('show');
+            }, 4000);
+        }
+
+        function createCelebrationParticles() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    createParticle();
+                }, i * 50);
+            }
+        }
+
+        function createFinalCelebration() {
+            for (let i = 0; i < 200; i++) {
+                setTimeout(() => {
+                    createParticle();
+                }, i * 20);
+            }
+        }
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 3 + 's';
+            particle.style.background = `hsl(${Math.random() * 60 + 30}, 100%, 50%)`;
+            
+            document.body.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 4000);
+        }
+
+        // GSAP animations for enhanced effects
+        gsap.registerPlugin();
+        
+        // Animate title on load
+        gsap.from('.main-title', {
+            duration: 2,
+            y: -100,
+            opacity: 0,
+            ease: 'bounce.out'
+        });
+        
+        // Animate control panel
+        gsap.from('.control-panel', {
+            duration: 1,
+            y: 50,
+            opacity: 0,
+            delay: 0.5,
+            ease: 'power2.out'
+        });
+        
+        // Animate countdown
+        gsap.from('.countdown-section', {
+            duration: 1,
+            scale: 0.8,
+            opacity: 0,
+            delay: 1,
+            ease: 'back.out'
+        });
+    </script>
+</body>
+</html>
