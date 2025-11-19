@@ -569,7 +569,7 @@
         }
 
         .photo-gallery {
-            display: grid;
+            display: ruby;
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             gap: 15px;
             margin: 30px 0;
@@ -904,6 +904,35 @@
             object-fit: contain;
             background: black;
         }
+        
+        .inputFinal {
+            padding: 12px 20px;
+            font-size: 1em;
+            border: 2px solid #b22222; /* rojo cálido */
+            border-radius: 12px; /* bordes redondeados */
+            outline: none;
+            background: #fff8f0; /* tono arena claro */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .inputFinal:focus {
+            border-color: #ff8c00; /* naranja cálido al enfocar */
+            box-shadow: 0 0 10px #ff8c00;
+            background: #fff3e6;
+        }
+    
+        .buttonFinal {
+            margin-top: 12px;
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 12px;
+            background: #b22222; /* rojo cálido */
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -1063,6 +1092,22 @@
         <br>
         <button class="day-button" id="openPuzzle">Abrir puzzle</button>
     </div>
+    <!-- Success Message Modal Final -->
+    <div class="success-message" id="successMessageFinal" role="dialog" aria-labelledby="successText">
+        <button class="success-close" id="successCloseFinal" aria-label="Cerrar">×</button>
+        <h3>¡Felicitaciones!</h3>
+        <p id="successTextFinal">Has completado el desafío</p>
+        <br>
+        <input class="inputFinal" type="text" id="finalInput" placeholder="¿Sabes la respuesta?">
+        <br>
+        <br>
+        <hr>
+        <p id="resultado"></p>
+        <br>
+        <hr>
+        <br>
+        <button class="buttonFinal" id="buttonFinal">Comprobar</button>
+    </div>
     
      <!-- Success Message Modal -->
     <div class="info-message" id="infoMessage" role="dialog" aria-labelledby="successText">
@@ -1086,6 +1131,8 @@
 
         </div>
     </div>
+    
+    
 
     <script>
         // Global variables
@@ -1856,26 +1903,38 @@
                         content.classList.add('show');
                     }, 500);
                     
-                    gameStates.revelation.completed = true;
-                    completedDays.add(23);
-                    updateProgress();
-                    showSuccessMessage('¡Felicidades! Has completado todos los desafíos. ¡Disfruta tu sorpresa!');
+                    showSuccessMessageButtonFinal('¡Felicidades! Has completado todos los desafíos. Bienvenida al último desafio, una pregunta y una respuesta.\nTiene 27 primaveras, un espíritu libre y un corazón que late al ritmo de aventuras inesperadas. Es única en el mundo, pero solo quien la conoce de verdad puede descifrarla. ¿Sabes su nombre?',() => {
+                            // Tomar el valor del input y convertirlo a minúsculas
+                            const input = document.getElementById('finalInput');
+                            const resultado = document.getElementById('resultado');
+                            const valor = input.value.trim().toLowerCase();
+                            
+                            if (valor === 'nerea') {
+                                resultado.textContent = '¡Correcto! Tu última letra secreta es la J.\nOrdena todas las letras encontradas y formarás la palabra secreta que tendrás que enviarsela a la cuenta de instagram que inicio todos estos retos.\n Pulsa sobre los iconos de las cámaras...';
+                                gameStates.revelation.completed = true;
+                                completedDays.add(23);
+                                updateProgress();
+                                 // Celebración final (solo una vez)
+                                setTimeout(() => {
+                                    if (!finalCelebrationShown) {
+                                        createFinalCelebration();
+                                        finalCelebrationShown = true;
+                                    }
+                                }, 2000);
+                            } else {
+                                resultado.textContent = 'El valor no coincide. Sigue intentandolo 😞 .';
+                            }
+                        });
                     
-                    // Celebración final (solo una vez)
-                    setTimeout(() => {
-                        if (!finalCelebrationShown) {
-                            createFinalCelebration();
-                            finalCelebrationShown = true;
-                        }
-                    }, 2000);
                 }
             });
         }
 
         function addPhoto(slotNumber) {
+            const imgs=["https://i.ibb.co/Dhy9BVr/Whats-App-Image-2025-11-19-at-13-48-04.jpg","https://i.ibb.co/CKSxVZT4/Whats-App-Image-2025-11-19-at-13-46-14.jpg","https://i.ibb.co/LdGpFqnd/Whats-App-Image-2025-11-19-at-13-45-18.jpg","https://i.ibb.co/rq3dx5t/Whats-App-Image-2025-11-19-at-13-44-36.jpg"]
             const slot = document.querySelector(`#photoGallery .photo-slot:nth-child(${slotNumber})`);
             slot.classList.add('filled');
-            slot.textContent = '📸';
+            slot.innerHTML  = '<img style="height: 250%;" src="'+imgs[slotNumber-1]+'" alt="Imagen">';
             slot.style.background = 'linear-gradient(135deg, #32CD32, #228B22)';
             slot.style.animation = 'correctTile 0.6s ease-out';
         }
@@ -2044,6 +2103,20 @@
                 modal.classList.remove('show');
             });
             document.getElementById('openPuzzle').addEventListener('click', handleButton);
+        }
+        
+        function showSuccessMessageButtonFinal(text,handleButton) {
+            const modal = document.getElementById('successMessageFinal');
+            const messageText = document.getElementById('successTextFinal');
+            
+            messageText.textContent = text;
+            modal.classList.add('show');
+            
+            const successClose = document.getElementById('successCloseFinal')
+            successClose.addEventListener('click', () => {
+                modal.classList.remove('show');
+            });
+            document.getElementById('buttonFinal').addEventListener('click', handleButton);
         }
         
         function showInfoMessage(text) {
