@@ -14,6 +14,10 @@
             padding: 0;
             box-sizing: border-box;
             user-select: none;
+            -webkit-user-select: none; /* Safari/Chrome */
+            -moz-user-select: none;    /* Firefox */
+            -ms-user-select: none;     /* IE/Edge */
+            user-select: none;         /* Estándar */
         }
 
         body {
@@ -22,6 +26,16 @@
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+        }
+        
+        .no-select {
+            -webkit-user-select: none; /* Safari/Chrome */
+            -moz-user-select: none;    /* Firefox */
+            -ms-user-select: none;     /* IE/Edge */
+            user-select: none;         /* Estándar */
+            
+            -webkit-touch-callout: none; /* iOS: evita menú al mantener pulsado */
+            -webkit-tap-highlight-color: transparent; /* iOS/Android: elimina el highlight al tocar */
         }
 
         /* Moroccan Pattern Overlay */
@@ -1502,7 +1516,7 @@
                 target.dataset.shape = obj.name;
                 
                 const object = document.createElement('div');
-                object.className = 'silhouette-object';
+                object.classList.add('silhouette-object', 'no-select');
                 object.textContent = shuffledObjects[index].emoji;
                 object.dataset.shape = shuffledObjects[index].name;
                 object.draggable = true;
