@@ -575,6 +575,10 @@
             gap: 15px;
             margin: 30px 0;
         }
+        
+        .photo{
+            height: 250%;
+        }
 
         .photo-slot {
             width: 100px;
@@ -805,6 +809,10 @@
                 width: 50px;
                 height: 50px;
                 font-size: 1rem;
+            }
+            
+            .photo{
+                height: 100%;
             }
         }
         
@@ -1911,6 +1919,8 @@
                             const valor = input.value.trim().toLowerCase();
                             
                             if (valor === 'nerea') {
+                                const messageText = document.getElementById('successTextFinal');
+                                messageText.hidden = true;
                                 resultado.textContent = '¡Correcto! Tu última letra secreta es la J.\nOrdena todas las letras encontradas y formarás la palabra secreta que tendrás que enviarsela a la cuenta de instagram que inicio todos estos retos.\n Pulsa sobre los iconos de las cámaras...';
                                 gameStates.revelation.completed = true;
                                 completedDays.add(23);
@@ -1935,7 +1945,7 @@
             const imgs=["https://i.ibb.co/Dhy9BVr/Whats-App-Image-2025-11-19-at-13-48-04.jpg","https://i.ibb.co/CKSxVZT4/Whats-App-Image-2025-11-19-at-13-46-14.jpg","https://i.ibb.co/LdGpFqnd/Whats-App-Image-2025-11-19-at-13-45-18.jpg","https://i.ibb.co/rq3dx5t/Whats-App-Image-2025-11-19-at-13-44-36.jpg"]
             const slot = document.querySelector(`#photoGallery .photo-slot:nth-child(${slotNumber})`);
             slot.classList.add('filled');
-            slot.innerHTML  = '<img style="height: 250%;" src="'+imgs[slotNumber-1]+'" alt="Imagen">';
+            slot.innerHTML  = '<img class="photo" src="'+imgs[slotNumber-1]+'" alt="Imagen">';
             slot.style.background = 'linear-gradient(135deg, #32CD32, #228B22)';
             slot.style.animation = 'correctTile 0.6s ease-out';
         }
