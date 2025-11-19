@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/128/5463/5463339.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sorpresa de Cumpleaños</title>
@@ -285,6 +284,9 @@
             justify-content: center;
             flex-direction: column;
         }
+        
+
+
 
         /* Game 1: Mosaico Mágico Avanzado */
         .mosaic-advanced {
@@ -401,16 +403,16 @@
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             gap: 4px;
-            max-width: 550px;
+            max-width: 350px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 5px;
             background: rgba(139, 69, 19, 0.1);
             border-radius: 15px;
         }
 
         .labyrinth-cell-advanced {
-            width: 45px;
-            height: 45px;
+            width: 30px;
+            height: 30px;
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -691,6 +693,16 @@
             color: #654321;
             font-size: 1.1rem;
         }
+    
+        .success-close {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            border: none;
+            background: transparent;
+            font-size: 24px;
+            cursor: pointer;
+        }
         
         /* Info Messages */
         .info-message {
@@ -793,6 +805,104 @@
                 height: 50px;
                 font-size: 1rem;
             }
+        }
+        
+            /* Fondo oscuro */
+        #popupOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+        }
+    
+        /* Contenedor del popup */
+        #popupContainer {
+            position: relative;
+            width: 90%;
+            height: 90%;
+            background: black;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+    
+        /* X de cierre */
+        #popupClose {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 32px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            z-index: 10000;
+            color:white;
+        }
+    
+        /* Imagen interior */
+        #popupImage {
+            width: 100%;
+            height: 80%;
+            object-fit: contain;
+            background: black;
+        }
+        
+                    /* Fondo oscuro */
+        #popupOverlayIframe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+        }
+        
+        /* Contenedor del popup */
+        #popupContainerIframe {
+            position: relative;
+            width: 90%;
+            height: 90%;
+            background: black;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+    
+        /* X de cierre */
+        #popupCloseIframe {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 32px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            z-index: 10000;
+            color:white;
+        }
+    
+        /* Imagen interior */
+        #popupIframe {
+            width: 100%;
+            height: 80%;
+            object-fit: contain;
+            background: black;
         }
     </style>
 </head>
@@ -937,14 +1047,44 @@
 
     <!-- Success Message Modal -->
     <div class="success-message" id="successMessage" role="dialog" aria-labelledby="successText">
+        <button class="success-close" id="successClose" aria-label="Cerrar">×</button>
         <h3>¡Felicitaciones!</h3>
         <p id="successText">Has completado el desafío</p>
+        <p>Espera...</p>
+    </div>
+    
+    <!-- Success Message Modal Ext -->
+    <div class="success-message" id="successMessageExt" role="dialog" aria-labelledby="successText">
+        <button class="success-close" id="successCloseExt" aria-label="Cerrar">×</button>
+        <h3>¡Felicitaciones!</h3>
+        <p id="successTextExt">Has completado el desafío</p>
+        <br>
+        <hr>
+        <br>
+        <button class="day-button" id="openPuzzle">Abrir puzzle</button>
     </div>
     
      <!-- Success Message Modal -->
     <div class="info-message" id="infoMessage" role="dialog" aria-labelledby="successText">
         <h3>¡Hola!</h3>
         <p id="infoText">Has completado el desafío</p>
+    </div>
+    
+    <!-- Popup -->
+    <div id="popupOverlay">
+        <div id="popupContainer">
+            <button id="popupClose">×</button>
+            <img id="popupImage" src="" alt="Imagen">
+        </div>
+    </div>
+    
+    <!-- Popup Iframe -->
+    <div id="popupOverlayIframe">
+        <div id="popupContainerIframe">
+            <button id="popupCloseIframe">×</button>
+            <iframe id="popupIframe" src="" allow="fullscreen; clipboard-read; clipboard-write; autoplay; encrypted-media; picture-in-picture; web-share"></iframe>
+
+        </div>
     </div>
 
     <script>
@@ -1195,7 +1335,30 @@
         }
 
         function rotateMosaicTile(tile, solution) {
-            if (gameStates.mosaic.completed) return;
+            if (gameStates.mosaic.completed) {
+                showSuccessMessageButton('¡Ya has completado el Mosaico mágico!, revisa la imagen y encuentra el mensaje secreto, guarda este mensaje será importante más adelante',()=>{
+                    const popupOverlay = document.getElementById('popupOverlay');
+                    const popupImage = document.getElementById('popupImage');
+                    const popupClose = document.getElementById('popupClose');
+                    
+                    // Abrir popup con imagen
+                    function showPopup(imgSrc) {
+                        popupImage.src = imgSrc;
+                        popupOverlay.style.display = 'flex';
+                    }
+                    
+                    // Cerrar popup
+                    function closePopup() {
+                        popupOverlay.style.display = 'none';
+                        popupImage.src = "";
+                    }
+                    
+                    popupClose.addEventListener('click', closePopup);
+                    
+                    showPopup("https://raw.githubusercontent.com/pacoDevelop/birthday-/refs/heads/main/sources/imgs/sis.jpg");
+                });
+                return
+            };
             
             const currentRotation = parseInt(tile.dataset.rotation);
             const newRotation = (currentRotation + 90) % 360;
@@ -1231,11 +1394,33 @@
                 gameStates.mosaic.completed = true;
                 completedDays.add(19);
                 updateProgress();
-                showSuccessMessage('¡Mosaico mágico completado perfectamente!');
+                showSuccessMessageButton('¡Mosaico mágico completado perfectamente!, revisa la imagen y encuentra el mensaje secreto, guarda este mensaje será importante más adelante',()=>{
+                    const popupOverlay = document.getElementById('popupOverlay');
+                    const popupImage = document.getElementById('popupImage');
+                    const popupClose = document.getElementById('popupClose');
+
+                    
+                    // Abrir popup con imagen
+                    function showPopup(imgSrc) {
+                        popupImage.src = imgSrc;
+                        popupOverlay.style.display = 'flex';
+                    }
+                    
+                    // Cerrar popup
+                    function closePopup() {
+                        popupOverlay.style.display = 'none';
+                        popupImage.src = "";
+                    }
+                    
+                    popupClose.addEventListener('click', closePopup);
+                    
+                    showPopup("https://raw.githubusercontent.com/pacoDevelop/birthday-/refs/heads/main/sources/imgs/sis.jpg");
+                });
                 createCelebrationParticles();
             }
         }
-
+        
+        
         // Game 2: Advanced Silhouette
         function initializeSilhouetteAdvanced() {
             const container = document.getElementById('silhouetteAdvanced');
@@ -1247,6 +1432,8 @@
                 { emoji: '🪙', name: 'coin', shape: 'circle' },
                 { emoji: '🧿', name: 'eye', shape: 'oval' }
             ];
+            
+            const game20 = document.getElementById('game20'); 
             
             const shuffledObjects = [...objects].sort(() => Math.random() - 0.5);
             
@@ -1269,11 +1456,38 @@
                 
                 target.addEventListener('dragover', handleDragOver);
                 target.addEventListener('drop', handleSilhouetteAdvancedDrop);
+                game20.addEventListener('click', ()=>{
+                    if(gameStates.silhouette.completed){
+                        showSuccessMessageButton('¡Ya está completado Siluetas!, ¿lo de ayer fue complicado?, resuelve el enigma de hoy para obtener el siguiente mensaje, recuerda guardar los mensajes.',()=>{
+                            const popupOverlayIframe = document.getElementById('popupOverlayIframe');
+                            const popupIframe = document.getElementById('popupIframe');
+                            const popupCloseIframe = document.getElementById('popupCloseIframe');
+                            
+                            // Abrir popup con imagen
+                            function showPopup(imgSrc) {
+                                popupIframe.src = imgSrc;
+                                popupOverlayIframe.style.display = 'flex';
+                            }
+                            
+                            // Cerrar popup
+                            function closePopup() {
+                                popupOverlayIframe.style.display = 'none';
+                                popupImage.src = "https://ruwix.com/secret/?message=F&lang=es";
+                            }
+                            
+                            popupCloseIframe.addEventListener('click', closePopup);
+                            
+                            showPopup("https://ruwix.com/secret/?message=F&lang=es");
+                        });
+                        return
+                    }
+                });
                 
                 pair.appendChild(target);
                 pair.appendChild(object);
                 container.appendChild(pair);
             });
+            
         }
 
         function handleSilhouetteAdvancedDrop(e) {
@@ -1302,170 +1516,237 @@
                         gameStates.silhouette.completed = true;
                         completedDays.add(20);
                         updateProgress();
-                        showSuccessMessage('¡Siluetas completadas!');
+                        showSuccessMessageButton('¡Siluetas completadas!, ¿lo de ayer fue complicado?, resuelve el enigma de hoy para obtener el siguiente mensaje, recuerda guardar los mensajes.',()=>{
+                                const popupOverlayIframe = document.getElementById('popupOverlayIframe');
+                                const popupIframe = document.getElementById('popupIframe');
+                                const popupCloseIframe = document.getElementById('popupCloseIframe');
+                                
+                                // Abrir popup con imagen
+                                function showPopup(imgSrc) {
+                                    popupIframe.src = imgSrc;
+                                    popupOverlayIframe.style.display = 'flex';
+                                }
+                                
+                                // Cerrar popup
+                                function closePopup() {
+                                    popupOverlayIframe.style.display = 'none';
+                                    popupImage.src = "";
+                                }
+                                
+                                popupCloseIframe.addEventListener('click', closePopup);
+                                
+                                showPopup("https://ruwix.com/secret/?message=F&lang=es");
+                            });
+                            return
+                        };
                         createCelebrationParticles();
                     }
                 }
             }
-        }
+        
 
         // Game 3: Advanced Labyrinth - CORREGIDO y OPTIMIZADO
         // Inicializa y renderiza el laberinto (funciona para rectángulos)
-function initializeLabyrinthAdvanced() {
-    const grid = document.getElementById('labyrinthAdvanced');
-    if (!grid) {
-        console.error('No existe el elemento #labyrinthAdvanced');
-        return;
-    }
-
-    // Tu laberinto (puedes cambiar tamaño/filas)
-    const labyrinth = [
-         [0, 0, 0, 1, 0, 0, 0,0,0,0], 
-[1, 1, 0, 1, 0, 1, 0,1,1,0], 
-[0, 1, 0, 1, 0, 1, 0,1,0,0],
-[0, 0, 0, 0, 0, 1, 0,1,0,1],
-[1, 1, 1, 1, 0, 1, 0,1,0,1],
-[0, 0, 0, 1, 0, 0, 0,1,0,0],
-[0, 1, 0, 1, 1, 1, 1,1,1,0],
-[0, 1, 0, 0, 0, 1, 0,1,0,0],
-[0, 1, 1, 1, 0, 0, 1,1,0,1],
-[0, 0, 0, 0, 0, 0, 0,0,0,1],
-[0, 1, 1, 0, 1, 1, 1,1,0,1],
-[0, 0, 1, 0, 0, 0, 0,1,0,0],
-[0, 1, 1, 1, 1, 1, 0,1,1,0],
-[0, 1, 0, 0, 0, 0, 0,1,0,0],
-[0, 1, 0, 1, 1, 1, 1,1,0,1],
-[0, 1, 0, 0, 0, 0, 2,0,1,1]
-    ];
-    
-    
-
-    // Normalizar dimensiones: filas reales y columnas máximas
-    const rows = labyrinth.length;
-    const cols = Math.max(...labyrinth.map(r => r.length));
-
-    // Asegurar que cada fila tenga longitud 'cols' (rellenar con muros si hiciera falta)
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            if (typeof labyrinth[r][c] === 'undefined') labyrinth[r][c] = 1;
-        }
-    }
-
-    // Estilo del grid para que cuadre visualmente
-    grid.innerHTML = '';
-    grid.style.display = 'grid';
-    grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-    grid.style.gap = '4px'; // opcional
-
-    // Buscar posición inicial válida (si (0,0) no fuera caminable)
-    let startIndex = 0;
-    if (labyrinth[0][0] === 1) {
-        let found = false;
-        for (let r = 0; r < rows && !found; r++) {
-            for (let c = 0; c < cols && !found; c++) {
-                if (labyrinth[r][c] === 0) {
-                    startIndex = r * cols + c;
-                    found = true;
-                }
-            }
-        }
-        if (!found) {
-            console.error('No hay celdas caminables en el laberinto.');
+    function initializeLabyrinthAdvanced() {
+        
+        const grid = document.getElementById('labyrinthAdvanced');
+        if (!grid) {
+            console.error('No existe el elemento #labyrinthAdvanced');
             return;
         }
+    
+        // Tu laberinto (puedes cambiar tamaño/filas)
+        const labyrinth = [
+             [0, 0, 0, 1, 0, 0, 0,0,0,0], 
+    [1, 1, 0, 1, 0, 1, 0,1,1,0], 
+    [0, 1, 0, 1, 0, 1, 0,1,0,0],
+    [0, 0, 0, 0, 0, 1, 0,1,0,1],
+    [1, 1, 1, 1, 0, 1, 0,1,0,1],
+    [0, 0, 0, 1, 0, 0, 0,1,0,0],
+    [0, 1, 0, 1, 1, 1, 1,1,1,0],
+    [0, 1, 0, 0, 0, 1, 0,1,0,0],
+    [0, 1, 1, 1, 0, 0, 1,1,0,1],
+    [0, 0, 0, 0, 0, 0, 0,0,0,1],
+    [0, 1, 1, 0, 1, 1, 1,1,0,1],
+    [0, 0, 1, 0, 0, 0, 0,1,0,0],
+    [0, 1, 1, 1, 1, 1, 0,1,1,0],
+    [0, 1, 0, 0, 0, 0, 0,1,0,0],
+    [0, 1, 0, 1, 1, 1, 1,1,0,1],
+    [0, 1, 0, 0, 0, 0, 2,0,1,1]
+        ];
+        
+        
+    
+        // Normalizar dimensiones: filas reales y columnas máximas
+        const rows = labyrinth.length;
+        const cols = Math.max(...labyrinth.map(r => r.length));
+    
+        // Asegurar que cada fila tenga longitud 'cols' (rellenar con muros si hiciera falta)
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                if (typeof labyrinth[r][c] === 'undefined') labyrinth[r][c] = 1;
+            }
+        }
+    
+        // Estilo del grid para que cuadre visualmente
+        grid.innerHTML = '';
+        grid.style.display = 'grid';
+        grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        grid.style.gap = '4px'; // opcional
+    
+        // Buscar posición inicial válida (si (0,0) no fuera caminable)
+        let startIndex = 0;
+        if (labyrinth[0][0] === 1) {
+            let found = false;
+            for (let r = 0; r < rows && !found; r++) {
+                for (let c = 0; c < cols && !found; c++) {
+                    if (labyrinth[r][c] === 0) {
+                        startIndex = r * cols + c;
+                        found = true;
+                    }
+                }
+            }
+            if (!found) {
+                console.error('No hay celdas caminables en el laberinto.');
+                return;
+            }
+        }
+    
+            // Renderizar celdas
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const index = row * cols + col;
+                    const cell = document.createElement('div');
+                    cell.className = 'labyrinth-cell-advanced';
+                    cell.dataset.index = index;
+                    cell.style.minHeight = '28px'; // útil para ver las celdas, ajustar CSS a tu gusto
+                    cell.style.display = 'flex';
+                    cell.style.alignItems = 'center';
+                    cell.style.justifyContent = 'center';
+                    cell.style.userSelect = 'none';
+        
+                    const cellType = labyrinth[row][col];
+        
+                    if (cellType === 1) {
+                        cell.classList.add('wall');
+                        // opcional: estilo rápido si no tienes CSS
+                        // cell.style.background = '#333';
+                    } else if (cellType === 2) {
+                        cell.classList.add('end');
+                        cell.textContent = '🏆';
+                    } else if (index === startIndex) {
+                        cell.classList.add('start');
+                        cell.textContent = '🏁';
+                        cell.classList.add('visited');
+                    }
+        
+                    if (cellType !== 1) {
+                        // paso cols para cálculos correctos en handlers
+                        cell.addEventListener('click', (e) => handleLabyrinthClick(index, labyrinth, cols, e));
+                        // accesible mediante teclado si quieres (opcional)
+                        cell.tabIndex = 0;
+                    } else {
+                        cell.setAttribute('aria-hidden', 'true');
+                    }
+        
+                    grid.appendChild(cell);
+                }
+            }
+        
+            currentLabPosition = startIndex;
+            gameStates.labyrinth.completed = false;
     }
 
-    // Renderizar celdas
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-            const index = row * cols + col;
-            const cell = document.createElement('div');
-            cell.className = 'labyrinth-cell-advanced';
-            cell.dataset.index = index;
-            cell.style.minHeight = '28px'; // útil para ver las celdas, ajustar CSS a tu gusto
-            cell.style.display = 'flex';
-            cell.style.alignItems = 'center';
-            cell.style.justifyContent = 'center';
-            cell.style.userSelect = 'none';
-
-            const cellType = labyrinth[row][col];
-
-            if (cellType === 1) {
-                cell.classList.add('wall');
-                // opcional: estilo rápido si no tienes CSS
-                // cell.style.background = '#333';
-            } else if (cellType === 2) {
-                cell.classList.add('end');
-                cell.textContent = '🏆';
-            } else if (index === startIndex) {
-                cell.classList.add('start');
-                cell.textContent = '🏁';
-                cell.classList.add('visited');
-            }
-
-            if (cellType !== 1) {
-                // paso cols para cálculos correctos en handlers
-                cell.addEventListener('click', (e) => handleLabyrinthClick(index, labyrinth, cols, e));
-                // accesible mediante teclado si quieres (opcional)
-                cell.tabIndex = 0;
-            } else {
-                cell.setAttribute('aria-hidden', 'true');
-            }
-
-            grid.appendChild(cell);
+    // Handler del click (usa cols para cálculo correcto en matrices rectangulares)
+    function handleLabyrinthClick(index, labyrinth, cols, event) {
+        if (gameStates.labyrinth.completed) {
+            showSuccessMessage('¡Laberinto completado! Ya encontraste el camino.');
+            showSuccessMessageButton('¡Laberinto completado! Ya encontraste el camino, ¿un cubo de rubick complicado el de ayer?, resuelve el puzzle de hoy para ver en la imagen el mensaje, observa bien, recuerda guardar los mensajes.',()=>{
+                const popupOverlayIframe = document.getElementById('popupOverlayIframe');
+                const popupIframe = document.getElementById('popupIframe');
+                const popupCloseIframe = document.getElementById('popupCloseIframe');
+                
+                // Abrir popup con imagen
+                function showPopup(imgSrc) {
+                    popupIframe.src = imgSrc;
+                    popupOverlayIframe.style.display = 'flex';
+                }
+                
+                // Cerrar popup
+                function closePopup() {
+                    popupOverlayIframe.style.display = 'none';
+                    popupImage.src = "";
+                }
+                
+                popupCloseIframe.addEventListener('click', closePopup);
+                
+                showPopup("https://www.jigsawplanet.com/?rc=play&pid=15fb82fb938c&view=iframe&bgcolor=0xc8872d");
+            });
+            return
+        };
+    
+        // Safety: si no viene event, buscar el elemento por dataset
+        const clickedCell = event && event.currentTarget ? event.currentTarget : document.querySelector(`[data-index="${index}"]`);
+        if (!clickedCell) return;
+    
+        const row = Math.floor(index / cols);
+        const col = index % cols;
+    
+        // Si por algún motivo la celda es muro o fuera de rango
+        if (!labyrinth[row] || labyrinth[row][col] === 1) {
+            console.log('clic en pared o fuera de rango', row, col);
+            return;
+        }
+    
+        // No permitir movimientos no adyacentes
+        if (!isAdjacent(currentLabPosition, index, cols)) {
+            console.log('Movimiento no adyacente:', currentLabPosition, '→', index);
+            return;
+        }
+    
+        // Marcar visitada y actualizar posición
+        clickedCell.classList.add('visited');
+        currentLabPosition = index;
+    
+        // Verificar meta
+        if (labyrinth[row][col] === 2) {
+            gameStates.labyrinth.completed = true;
+            console.log('Meta alcanzada en', row, col);
+            if (typeof completedDays !== 'undefined' && completedDays.add) completedDays.add(21);
+            if (typeof updateProgress === 'function') updateProgress();
+            if (typeof showSuccessMessage === 'function') showSuccessMessageButton('¡Laberinto completado! Has encontrado el camino, ¿un cubo de rubick complicado el de ayer?, resuelve el puzzle de hoy para ver en la imagen el mensaje, observa bien, recuerda guardar los mensajes.',()=>{
+                const popupOverlayIframe = document.getElementById('popupOverlayIframe');
+                const popupIframe = document.getElementById('popupIframe');
+                const popupCloseIframe = document.getElementById('popupCloseIframe');
+                
+                // Abrir popup con imagen
+                function showPopup(imgSrc) {
+                    popupIframe.src = imgSrc;
+                    popupOverlayIframe.style.display = 'flex';
+                }
+                
+                // Cerrar popup
+                function closePopup() {
+                    popupOverlayIframe.style.display = 'none';
+                    popupImage.src = "";
+                }
+                
+                popupCloseIframe.addEventListener('click', closePopup);
+                
+                showPopup("https://www.jigsawplanet.com/?rc=play&pid=15fb82fb938c&view=iframe&bgcolor=0xc8872d");
+            });
+            if (typeof createCelebrationParticles === 'function') createCelebrationParticles();
         }
     }
 
-    currentLabPosition = startIndex;
-    gameStates.labyrinth.completed = false;
-}
-
-// Handler del click (usa cols para cálculo correcto en matrices rectangulares)
-function handleLabyrinthClick(index, labyrinth, cols, event) {
-    if (gameStates.labyrinth.completed) return;
-
-    // Safety: si no viene event, buscar el elemento por dataset
-    const clickedCell = event && event.currentTarget ? event.currentTarget : document.querySelector(`[data-index="${index}"]`);
-    if (!clickedCell) return;
-
-    const row = Math.floor(index / cols);
-    const col = index % cols;
-
-    // Si por algún motivo la celda es muro o fuera de rango
-    if (!labyrinth[row] || labyrinth[row][col] === 1) {
-        console.log('clic en pared o fuera de rango', row, col);
-        return;
+    // Adyacencia correcta usando 'cols' (funciona para rectangular)
+    function isAdjacent(pos1, pos2, cols) {
+        const r1 = Math.floor(pos1 / cols);
+        const c1 = pos1 % cols;
+        const r2 = Math.floor(pos2 / cols);
+        const c2 = pos2 % cols;
+        return Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1;
     }
-
-    // No permitir movimientos no adyacentes
-    if (!isAdjacent(currentLabPosition, index, cols)) {
-        console.log('Movimiento no adyacente:', currentLabPosition, '→', index);
-        return;
-    }
-
-    // Marcar visitada y actualizar posición
-    clickedCell.classList.add('visited');
-    currentLabPosition = index;
-
-    // Verificar meta
-    if (labyrinth[row][col] === 2) {
-        gameStates.labyrinth.completed = true;
-        console.log('Meta alcanzada en', row, col);
-        if (typeof completedDays !== 'undefined' && completedDays.add) completedDays.add(21);
-        if (typeof updateProgress === 'function') updateProgress();
-        if (typeof showSuccessMessage === 'function') showSuccessMessage('¡Laberinto completado! Has encontrado el camino.');
-        if (typeof createCelebrationParticles === 'function') createCelebrationParticles();
-    }
-}
-
-// Adyacencia correcta usando 'cols' (funciona para rectangular)
-function isAdjacent(pos1, pos2, cols) {
-    const r1 = Math.floor(pos1 / cols);
-    const c1 = pos1 % cols;
-    const r2 = Math.floor(pos2 / cols);
-    const c2 = pos2 % cols;
-    return Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1;
-}
 
         // Game 4: Advanced Spice Puzzle
         function initializeSpicePuzzle() {
@@ -1499,7 +1780,14 @@ function isAdjacent(pos1, pos2, cols) {
         }
 
         function cycleSpiceCell(cell, spices, solution, index) {
-            if (gameStates.spices.completed) return; // No permitir si ya completado
+            if (gameStates.spices.completed) {
+                
+                showSuccessMessageButtonExt('¡Ya completaste el Puzzle de especias!, ¿que tal se te dio el puzzle de ayer?, resuelve este otro puzzle mas complicado de hoy para ver en la imagen el mensaje,fíjate bien, recuerda guardar los mensajes.',()=>{
+                window.open("https://puzzel.org/es/slidingpuzzle/play?p=-OeNcw1uXDiuWkS1hERU", '_blank');
+            });
+                return
+                
+            }; // No permitir si ya completado
             
             const currentSpice = cell.dataset.currentSpice;
             const currentIndex = spices.indexOf(currentSpice);
@@ -1548,7 +1836,9 @@ function isAdjacent(pos1, pos2, cols) {
                 gameStates.spices.completed = true;
                 completedDays.add(22);
                 updateProgress();
-                showSuccessMessage('¡Puzzle de especias completado!');
+                showSuccessMessageButtonExt('¡Puzzle de especias completado!, ¿que tal se te dio el puzzle de ayer?, resuelve este otro puzzle mas complicado de hoy para ver en la imagen el mensaje,fijate bien, recuerda guardar los mensajes.',()=>{
+                window.open("https://puzzel.org/es/slidingpuzzle/play?p=-OeNcw1uXDiuWkS1hERU", '_blank');
+            });
                 createCelebrationParticles();
             }
         }
@@ -1679,6 +1969,17 @@ function isAdjacent(pos1, pos2, cols) {
                 document.getElementById('revelationContent').classList.add('show');
                 finalCelebrationShown = true;
             }
+            
+            const grid = document.getElementById('labyrinthAdvanced');
+            if (!grid) {
+                console.error('No existe el elemento #labyrinthAdvanced');
+                return;
+            }
+            if (gameStates.labyrinth.completed) {
+                const gradiente = 'linear-gradient(135deg, #87ff87, #ffffff)';
+                grid.style.background = gradiente;
+            
+        }
         }
 
         function toggleHint(hintId) {
@@ -1699,17 +2000,50 @@ function isAdjacent(pos1, pos2, cols) {
                 }, 5000);
             }
         }
-
+        
         function showSuccessMessage(text) {
             const modal = document.getElementById('successMessage');
             const messageText = document.getElementById('successText');
             
             messageText.textContent = text;
             modal.classList.add('show');
-            
-            setTimeout(() => {
+            const successClose = document.getElementById('successClose')
+            successClose.addEventListener('click', () => {
                 modal.classList.remove('show');
+            });
+            setTimeout(() => {
+               if (modal?.classList.contains('show')) {
+                    modal.classList.remove('show');
+                }
             }, 4000);
+        }
+
+        function showSuccessMessageButton(text,handleButton) {
+            const modal = document.getElementById('successMessage');
+            const messageText = document.getElementById('successText');
+            
+            messageText.textContent = text;
+            modal.classList.add('show');
+            
+            const successClose = document.getElementById('successClose')
+            successClose.addEventListener('click', () => {
+                modal.classList.remove('show');
+            });
+            setTimeout(() => {handleButton();}, 6000);
+        }
+        
+        function showSuccessMessageButtonExt(text,handleButton) {
+            const modal = document.getElementById('successMessageExt');
+            const messageText = document.getElementById('successTextExt');
+            
+            messageText.textContent = text;
+            modal.classList.add('show');
+            
+            const successClose = document.getElementById('successCloseExt')
+            successClose.addEventListener('click', () => {
+                modal.classList.remove('show');
+            });
+            document.getElementById('openPuzzle').addEventListener('click', handleButton);
         }
         
         function showInfoMessage(text) {
