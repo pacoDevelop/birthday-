@@ -1730,7 +1730,6 @@
     // Handler del click (usa cols para cálculo correcto en matrices rectangulares)
     function handleLabyrinthClick(index, labyrinth, cols, event) {
         if (gameStates.labyrinth.completed) {
-            showSuccessMessage('¡Laberinto completado! Ya encontraste el camino.');
             showSuccessMessageButton('¡Laberinto completado! Ya encontraste el camino, ¿un cubo de rubick complicado el de ayer?, resuelve el puzzle de hoy para ver en la imagen el mensaje, observa bien, recuerda guardar los mensajes.',()=>{
                 const popupOverlayIframe = document.getElementById('popupOverlayIframe');
                 const popupIframe = document.getElementById('popupIframe');
