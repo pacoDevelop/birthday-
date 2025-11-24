@@ -1,0 +1,947 @@
+ * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none; /* Safari/Chrome */
+            -moz-user-select: none;    /* Firefox */
+            -ms-user-select: none;     /* IE/Edge */
+            user-select: none;         /* Estándar */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 25%, #F4A460 50%, #DEB887 75%, #F5DEB3 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .no-select {
+            -webkit-user-select: none; /* Safari/Chrome */
+            -moz-user-select: none;    /* Firefox */
+            -ms-user-select: none;     /* IE/Edge */
+            user-select: none;         /* Estándar */
+            
+            -webkit-touch-callout: none; /* iOS: evita menú al mantener pulsado */
+            -webkit-tap-highlight-color: transparent; /* iOS/Android: elimina el highlight al tocar */
+        }
+
+        /* Moroccan Pattern Overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(210, 105, 30, 0.1) 0%, transparent 50%);
+            background-size: 100px 100px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Test Mode Button - Fixed Position */
+        .test-mode-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #FF6347, #DC143C);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .test-mode-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .test-mode-button.active {
+            background: linear-gradient(135deg, #32CD32, #228B22);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
+            50% { box-shadow: 0 5px 25px rgba(50, 205, 50, 0.4); }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .main-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 900;
+            color: #8B4513;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #654321;
+            font-weight: 300;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .mode-indicator {
+            display: inline-block;
+            background: linear-gradient(135deg, #D2691E, #F4A460);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .mode-indicator.test-mode {
+            background: linear-gradient(135deg, #32CD32, #228B22);
+        }
+
+        .day-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .day-button {
+            background: linear-gradient(135deg, #D2691E, #F4A460);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .day-button.active {
+            background: linear-gradient(135deg, #D2691E, #F4A460)!important;
+            /*box-shadow: 0 0 20px #8b4513;*/
+            /*border: 2px solid #8b451300;*/
+        }
+
+        .day-button.locked {
+            background: linear-gradient(135deg, #808080, #696969);
+            /*cursor: not-allowed;*/
+            opacity: 0.6;
+        }
+
+        .day-button.locked:hover {
+            transform: none;
+        }
+
+        /* Countdown Section */
+        .countdown-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 2px solid #D2691E;
+        }
+
+        .countdown-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #8B4513;
+            margin-bottom: 30px;
+        }
+
+        .countdown-display {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .countdown-item {
+            background: linear-gradient(135deg, #D2691E, #F4A460);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            min-width: 100px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .countdown-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .countdown-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .countdown-message {
+            font-size: 1.1rem;
+            color: #8B4513;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+
+        /* Games Grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border: 2px solid #D2691E;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+
+        .game-card.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .game-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: #8B4513;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .game-date {
+            text-align: center;
+            color: #D2691E;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .game-content {
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+
+
+
+        /* Game 1: Mosaico Mágico Avanzado */
+        .mosaic-advanced {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+
+        .mosaic-tile {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .mosaic-tile:hover {
+            transform: scale(1.05);
+            border-color: #FFD700;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .mosaic-tile.correct {
+            animation: correctTile 0.6s ease-out;
+            border-color: #32CD32;
+            box-shadow: 0 0 20px rgba(50, 205, 50, 0.6);
+        }
+
+        @keyframes correctTile {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1) rotate(5deg); }
+            100% { transform: scale(1); }
+        }
+
+        /* Game 2: Siluetas del Zoco Mejorado */
+        .silhouette-advanced {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .silhouette-pair {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .silhouette-target {
+            width: 100px;
+            height: 100px;
+            border: 3px dashed #D2691E;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(210, 105, 30, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .silhouette-target.correct {
+            border-color: #32CD32;
+            background: rgba(50, 205, 50, 0.2);
+            animation: targetCorrect 0.5s ease-out;
+        }
+
+        .silhouette-target::before {
+            content: '?';
+            font-size: 2rem;
+            color: #D2691E;
+            opacity: 0.5;
+        }
+
+        .silhouette-object {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #8B4513, #D2691E);
+            border-radius: 12px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .silhouette-object:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .silhouette-object.dragging {
+            cursor: grabbing;
+            transform: rotate(10deg) scale(1.1);
+            z-index: 1000;
+        }
+
+        /* Game 3: Laberinto de Luz Avanzado */
+        .labyrinth-advanced {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+            max-width: 350px;
+            margin: 0 auto;
+            padding: 5px;
+            background: rgba(139, 69, 19, 0.1);
+            border-radius: 15px;
+        }
+
+        .labyrinth-cell-advanced {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            position: relative;
+            background: rgba(139, 69, 19, 0.2);
+        }
+
+        .labyrinth-cell-advanced.wall {
+            background: linear-gradient(135deg, #654321, #8B4513);
+            cursor: not-allowed;
+        }
+
+        .labyrinth-cell-advanced.start {
+            background: linear-gradient(135deg, #32CD32, #228B22);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .labyrinth-cell-advanced.end {
+            background: linear-gradient(135deg, #FF6347, #DC143C);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .labyrinth-cell-advanced.path {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #8B4513;
+            animation: pathGlow 0.3s ease-out;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+        }
+
+        .labyrinth-cell-advanced.visited {
+            background: linear-gradient(135deg, #87CEEB, #4682B4);
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Game 4: Puzzle de Especias Complejo */
+        .spice-puzzle {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            max-width: 350px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .spice-cell-advanced {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #D2691E;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 1.5rem;
+        }
+
+        .spice-cell-advanced:hover {
+            transform: scale(1.05);
+            border-color: #8B4513;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .spice-cell-advanced.correct {
+            background: linear-gradient(135deg, #32CD32, #228B22);
+            color: white;
+            border-color: #228B22;
+            animation: correctSpice 0.6s ease-out;
+        }
+
+        .spice-cell-advanced.incorrect {
+            background: linear-gradient(135deg, #DC143C, #8B0000);
+            color: white;
+            border-color: #8B0000;
+            animation: incorrectSpice 0.5s ease-out;
+        }
+
+        @keyframes correctSpice {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1) rotate(360deg); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes incorrectSpice {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Game 5: Gran Revelación Mejorada */
+        .revelation-advanced {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .treasure-chest {
+            width: 200px;
+            height: 150px;
+            background: linear-gradient(135deg, #8B4513, #654321);
+            border-radius: 10px;
+            margin: 0 auto 30px;
+            position: relative;
+            cursor: pointer;
+            transition: all 1s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .treasure-chest::before {
+            content: '💎';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            opacity: 0.3;
+            transition: all 0.5s ease;
+        }
+
+        .treasure-chest.open {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.5);
+        }
+
+        .treasure-chest.open::before {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .revelation-content {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease;
+        }
+
+        .revelation-content.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .photo{
+            height: 250%;
+        }
+
+        .photo-slot {
+            width: 100px;
+            height: 100px;
+            border: 3px dashed #D2691E;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(210, 105, 30, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .photo-slot:hover {
+            border-color: #8B4513;
+            background: rgba(139, 69, 19, 0.1);
+        }
+
+        .photo-slot.filled {
+            border-color: #32CD32;
+            background: rgba(50, 205, 50, 0.1);
+        }
+
+        /* Hints System */
+        .hint-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #FFD700;
+            color: #8B4513;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .hint-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .hint-tooltip {
+            position: absolute;
+            top: 45px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            max-width: 200px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .hint-tooltip.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Progress Indicator */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(139, 69, 19, 0.2);
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #32CD32, #228B22);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        /* Success Messages */
+        .success-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 3px solid #32CD32;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            max-width: 400px;
+        }
+
+        .success-message.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .success-message h3 {
+            font-family: 'Playfair Display', serif;
+            color: #228B22;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .success-message p {
+            color: #654321;
+            font-size: 1.1rem;
+        }
+    
+        .success-close {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            border: none;
+            background: transparent;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        /* Info Messages */
+        .info-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 3px solid #8b451375;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            max-width: 400px;
+        }
+
+        .info-message.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .info-message h3 {
+            font-family: 'Playfair Display', serif;
+            color: #8B4513;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .info-message p {
+            color: #654321;
+            font-size: 1.1rem;
+        }
+
+        /* Particle Effects */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #FFD700;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 4s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+            50% { transform: translateY(-30px) rotate(180deg); opacity: 0.5; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .test-mode-button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .day-selector {
+                gap: 10px;
+            }
+            
+            .day-button {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .countdown-display {
+                gap: 15px;
+            }
+            
+            .countdown-item {
+                min-width: 80px;
+                padding: 15px;
+            }
+            
+            .countdown-number {
+                font-size: 2rem;
+            }
+            
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .game-card {
+                padding: 0px;
+            }
+            
+            .mosaic-advanced {
+                grid-template-columns: repeat(5, 1fr);
+                max-width: 280px;
+                gap: 5px;
+            }
+            
+            .mosaic-tile {
+                width: 50px;
+                height: 50px;
+                font-size: 1rem;
+            }
+            
+            .photo{
+                height: 150%;
+            }
+        }
+        
+            /* Fondo oscuro */
+        #popupOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+        }
+    
+        /* Contenedor del popup */
+        #popupContainer {
+            position: relative;
+            width: 90%;
+            height: 90%;
+            background: black;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+    
+        /* X de cierre */
+        #popupClose {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 32px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            z-index: 10000;
+            color:white;
+        }
+    
+        /* Imagen interior */
+        #popupImage {
+            width: 100%;
+            height: 80%;
+            object-fit: contain;
+            background: black;
+        }
+        
+                    /* Fondo oscuro */
+        #popupOverlayIframe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+        }
+        
+        /* Contenedor del popup */
+        #popupContainerIframe {
+            position: relative;
+            width: 90%;
+            height: 90%;
+            background: black;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+    
+        /* X de cierre */
+        #popupCloseIframe {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 32px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            z-index: 10000;
+            color:white;
+        }
+    
+        /* Imagen interior */
+        #popupIframe {
+            width: 100%;
+            height: 80%;
+            object-fit: contain;
+            background: black;
+        }
+        
+        .inputFinal {
+            padding: 12px 20px;
+            font-size: 1em;
+            border: 2px solid #b22222; /* rojo cálido */
+            border-radius: 12px; /* bordes redondeados */
+            outline: none;
+            background: #fff8f0; /* tono arena claro */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .inputFinal:focus {
+            border-color: #ff8c00; /* naranja cálido al enfocar */
+            box-shadow: 0 0 10px #ff8c00;
+            background: #fff3e6;
+        }
+    
+        .buttonFinal {
+            margin-top: 12px;
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 12px;
+            background: #b22222; /* rojo cálido */
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
